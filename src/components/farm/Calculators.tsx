@@ -1,0 +1,14 @@
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { Minus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { formatKsh } from "@/lib/farm-data";
+import { WhatsAppButton } from "./WhatsAppButton";
+
+function Stepper({ value, setValue }: { value: number; setValue: (n: number) => void }) { return <div className="flex h-12 items-center rounded-md border border-input bg-background"><Button type="button" variant="ghost" size="icon" onClick={() => setValue(Math.max(1,value-1))} aria-label="Decrease quantity"><Minus/></Button><span className="min-w-12 text-center font-bold">{value}</span><Button type="button" variant="ghost" size="icon" onClick={() => setValue(value+1)} aria-label="Increase quantity"><Plus/></Button></div>; }
+
+export function EggCalculator() { const [qty,setQty]=useState(5); const [mode,setMode]=useState<"retail"|"wholesale">("wholesale"); const price=mode === "retail" ? 600 : 550; const total=qty*price; return <Calculator title="Estimate your egg order" note={`${qty} trays × ${formatKsh(price)} = ${formatKsh(total)}`}><div className="flex flex-wrap gap-2"><Button type="button" variant={mode==="retail"?"default":"outline"} onClick={()=>setMode("retail")}>Retail · KSh 600</Button><Button type="button" variant={mode==="wholesale"?"default":"outline"} onClick={()=>setMode("wholesale")}>Wholesale · KSh 550</Button></div><div className="mt-5 flex flex-wrap items-center gap-3"><Stepper value={qty} setValue={setQty}/><Button asChild size="lg"><Link to="/order" search={{product:"kienyeji-eggs"}}>Order Eggs</Link></Button><WhatsAppButton product="Fresh Kienyeji Eggs" quantity={qty} total={total}/></div></Calculator>; }
+
+export function MilkCalculator() { const [qty,setQty]=useState(5); const total=qty*60; return <Calculator title="Estimate your milk order" note={`${qty} litres × KSh 60 = ${formatKsh(total)}`}><div className="mb-5 flex flex-wrap gap-2">{[1,2,5,10,20].map(n=><Button key={n} type="button" variant={qty===n?"default":"outline"} onClick={()=>setQty(n)}>{n}L</Button>)}</div><div className="flex flex-wrap items-center gap-3"><Stepper value={qty} setValue={setQty}/><Button asChild size="lg"><Link to="/order" search={{product:"fresh-farm-milk"}}>Order Fresh Milk</Link></Button><WhatsAppButton product="Fresh Farm Milk" quantity={qty} total={total}/></div></Calculator>; }
+
+function Calculator({title,note,children}:{title:string;note:string;children:React.ReactNode}) { return <div className="rounded-lg border border-border bg-card p-5 shadow-lg sm:p-7"><p className="text-sm font-bold uppercase text-primary">Order calculator</p><h2 className="mt-1 font-display text-2xl font-bold">{title}</h2><p className="my-5 rounded-md bg-secondary p-4 text-xl font-extrabold text-primary">{note}</p>{children}</div>; }
