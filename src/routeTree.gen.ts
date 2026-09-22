@@ -10,14 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as CowsMilkRouteImport } from './routes/cows-milk'
 import { Route as EggsRouteImport } from './routes/eggs'
+import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as KienyejiChickenRouteImport } from './routes/kienyeji-chicken'
+import { Route as ProductsRouteImport } from './routes/products'
 import { Route as SheepRouteImport } from './routes/sheep'
+import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CowsMilkRoute = CowsMilkRouteImport.update({
@@ -30,9 +39,19 @@ const EggsRoute = EggsRouteImport.update({
   path: '/eggs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KienyejiChickenRoute = KienyejiChickenRouteImport.update({
   id: '/kienyeji-chicken',
   path: '/kienyeji-chicken',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SheepRoute = SheepRouteImport.update({
@@ -40,42 +59,90 @@ const SheepRoute = SheepRouteImport.update({
   path: '/sheep',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProductsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cows-milk': typeof CowsMilkRoute
   '/eggs': typeof EggsRoute
+  '/gallery': typeof GalleryRoute
   '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/products': typeof ProductsRouteWithChildren
   '/sheep': typeof SheepRoute
+  '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cows-milk': typeof CowsMilkRoute
   '/eggs': typeof EggsRoute
+  '/gallery': typeof GalleryRoute
   '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/products': typeof ProductsRouteWithChildren
   '/sheep': typeof SheepRoute
+  '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/cows-milk': typeof CowsMilkRoute
   '/eggs': typeof EggsRoute
+  '/gallery': typeof GalleryRoute
   '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/products': typeof ProductsRouteWithChildren
   '/sheep': typeof SheepRoute
+  '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cows-milk' | '/eggs' | '/kienyeji-chicken' | '/sheep'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/cows-milk'
+    | '/eggs'
+    | '/gallery'
+    | '/kienyeji-chicken'
+    | '/products'
+    | '/sheep'
+    | '/products/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cows-milk' | '/eggs' | '/kienyeji-chicken' | '/sheep'
-  id: '__root__' | '/' | '/cows-milk' | '/eggs' | '/kienyeji-chicken' | '/sheep'
+  to:
+    | '/'
+    | '/about'
+    | '/cows-milk'
+    | '/eggs'
+    | '/gallery'
+    | '/kienyeji-chicken'
+    | '/products'
+    | '/sheep'
+    | '/products/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/cows-milk'
+    | '/eggs'
+    | '/gallery'
+    | '/kienyeji-chicken'
+    | '/products'
+    | '/sheep'
+    | '/products/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   CowsMilkRoute: typeof CowsMilkRoute
   EggsRoute: typeof EggsRoute
+  GalleryRoute: typeof GalleryRoute
   KienyejiChickenRoute: typeof KienyejiChickenRoute
+  ProductsRoute: typeof ProductsRouteWithChildren
   SheepRoute: typeof SheepRoute
 }
 
@@ -86,6 +153,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cows-milk': {
@@ -102,11 +176,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EggsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kienyeji-chicken': {
       id: '/kienyeji-chicken'
       path: '/kienyeji-chicken'
       fullPath: '/kienyeji-chicken'
       preLoaderRoute: typeof KienyejiChickenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sheep': {
@@ -116,14 +204,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SheepRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof ProductsRoute
+    }
   }
 }
 
+interface ProductsRouteChildren {
+  ProductsSlugRoute: typeof ProductsSlugRoute
+}
+
+const ProductsRouteChildren: ProductsRouteChildren = {
+  ProductsSlugRoute: ProductsSlugRoute,
+}
+
+const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
+  ProductsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   CowsMilkRoute: CowsMilkRoute,
   EggsRoute: EggsRoute,
+  GalleryRoute: GalleryRoute,
   KienyejiChickenRoute: KienyejiChickenRoute,
+  ProductsRoute: ProductsRouteWithChildren,
   SheepRoute: SheepRoute,
 }
 export const routeTree = rootRouteImport
