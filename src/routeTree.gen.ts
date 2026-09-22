@@ -10,33 +10,73 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CowsMilkRouteImport } from './routes/cows-milk'
+import { Route as EggsRouteImport } from './routes/eggs'
+import { Route as KienyejiChickenRouteImport } from './routes/kienyeji-chicken'
+import { Route as SheepRouteImport } from './routes/sheep'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CowsMilkRoute = CowsMilkRouteImport.update({
+  id: '/cows-milk',
+  path: '/cows-milk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EggsRoute = EggsRouteImport.update({
+  id: '/eggs',
+  path: '/eggs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KienyejiChickenRoute = KienyejiChickenRouteImport.update({
+  id: '/kienyeji-chicken',
+  path: '/kienyeji-chicken',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SheepRoute = SheepRouteImport.update({
+  id: '/sheep',
+  path: '/sheep',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cows-milk': typeof CowsMilkRoute
+  '/eggs': typeof EggsRoute
+  '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/sheep': typeof SheepRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cows-milk': typeof CowsMilkRoute
+  '/eggs': typeof EggsRoute
+  '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/sheep': typeof SheepRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cows-milk': typeof CowsMilkRoute
+  '/eggs': typeof EggsRoute
+  '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/sheep': typeof SheepRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/cows-milk' | '/eggs' | '/kienyeji-chicken' | '/sheep'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/cows-milk' | '/eggs' | '/kienyeji-chicken' | '/sheep'
+  id: '__root__' | '/' | '/cows-milk' | '/eggs' | '/kienyeji-chicken' | '/sheep'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CowsMilkRoute: typeof CowsMilkRoute
+  EggsRoute: typeof EggsRoute
+  KienyejiChickenRoute: typeof KienyejiChickenRoute
+  SheepRoute: typeof SheepRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +88,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cows-milk': {
+      id: '/cows-milk'
+      path: '/cows-milk'
+      fullPath: '/cows-milk'
+      preLoaderRoute: typeof CowsMilkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eggs': {
+      id: '/eggs'
+      path: '/eggs'
+      fullPath: '/eggs'
+      preLoaderRoute: typeof EggsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kienyeji-chicken': {
+      id: '/kienyeji-chicken'
+      path: '/kienyeji-chicken'
+      fullPath: '/kienyeji-chicken'
+      preLoaderRoute: typeof KienyejiChickenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sheep': {
+      id: '/sheep'
+      path: '/sheep'
+      fullPath: '/sheep'
+      preLoaderRoute: typeof SheepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CowsMilkRoute: CowsMilkRoute,
+  EggsRoute: EggsRoute,
+  KienyejiChickenRoute: KienyejiChickenRoute,
+  SheepRoute: SheepRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
