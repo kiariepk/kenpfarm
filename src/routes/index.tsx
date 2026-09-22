@@ -1,24 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Egg, Milk, Bird, HeartHandshake } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ProductGrid, TrustBand, CtaBand } from "@/components/farm/PageParts";
+import { products } from "@/lib/farm-data";
+import hero from "@/assets/kenp-chickens.jpg";
+import eggs from "@/assets/kenp-eggs.jpg";
+import dairy from "@/assets/kenp-dairy.jpg";
+import sheep from "@/assets/kenp-sheep.jpg";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
-});
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
+export const Route = createFileRoute("/")({ head:()=>({meta:[{title:"KENP Kienyeji Farm | Quality Livestock & Farm Products Kenya"},{name:"description",content:"Shop Kienyeji chicken, fresh eggs, milk, dairy cattle and sheep from a trusted Kenyan livestock farm."},{property:"og:title",content:"KENP Kienyeji Farm"},{property:"og:description",content:"Quality livestock and fresh farm products raised with care in Kenya."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}],links:[{rel:"canonical",href:"/"}]}), component: Home });
+function Home(){return <>
+<section className="relative flex min-h-[76vh] items-end overflow-hidden bg-primary"><img src={hero} alt="Kienyeji chickens roaming freely at KENP Kienyeji Farm" width={1600} height={1000} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover"/><div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/75 to-transparent"/><div className="relative mx-auto w-full max-w-7xl px-5 pb-16 pt-28 lg:px-6"><div className="max-w-3xl animate-rise text-primary-foreground"><p className="mb-4 font-bold uppercase tracking-[.18em] text-highlight">Naturally raised in Kenya</p><h1 className="font-display text-4xl font-extrabold leading-[1.06] sm:text-6xl lg:text-7xl">Quality Kienyeji Chicken, Fresh Farm Products & Healthy Livestock</h1><p className="mt-5 max-w-2xl text-lg leading-8 text-primary-foreground/85">From our farm to your home — quality livestock and farm products raised with care.</p><div className="mt-8 flex flex-wrap gap-3"><Button asChild variant="hero" size="lg" className="h-12"><Link to="/products">Shop Farm Products <ArrowRight/></Link></Button><Button asChild variant="outline" size="lg" className="h-12 border-primary-foreground/50 bg-background/10 text-primary-foreground hover:bg-background hover:text-foreground"><Link to="/contact">Contact the Farm</Link></Button></div></div></div></section>
+<TrustBand/>
+<section className="mx-auto max-w-7xl px-5 py-18 lg:px-6"><div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-bold uppercase tracking-wider text-primary">Farm marketplace</p><h2 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Raised with care. Ready for you.</h2></div><Link to="/products" className="font-bold text-primary">View all products →</Link></div><ProductGrid items={products.filter(p=>p.featured)}/></section>
+<section className="bg-muted py-18"><div className="mx-auto max-w-7xl px-5 lg:px-6"><div className="grid gap-4 md:grid-cols-4">{[[Bird,"Kienyeji chicken",hero,"/kienyeji-chicken"],[Egg,"Fresh eggs",eggs,"/eggs"],[Milk,"Milk & cattle",dairy,"/cows-milk"],[HeartHandshake,"Quality sheep",sheep,"/sheep"]].map(([Icon,title,img,to])=><Link key={String(title)} to={to as "/kienyeji-chicken"} className="group relative min-h-72 overflow-hidden rounded-lg"><img src={img as string} alt={String(title)} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"/><div className="absolute inset-0 bg-gradient-to-t from-primary to-transparent"/><div className="absolute bottom-0 p-5 text-primary-foreground"><Icon className="mb-3 size-7 text-highlight"/><h3 className="font-display text-2xl font-bold">{String(title)}</h3></div></Link>)}</div></div></section><CtaBand/></>}

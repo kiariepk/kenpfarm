@@ -10,33 +10,209 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CowsMilkRouteImport } from './routes/cows-milk'
+import { Route as EggsRouteImport } from './routes/eggs'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as KienyejiChickenRouteImport } from './routes/kienyeji-chicken'
+import { Route as OrderRouteImport } from './routes/order'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as SheepRouteImport } from './routes/sheep'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ProductsIndexRouteImport } from './routes/products.index'
+import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CowsMilkRoute = CowsMilkRouteImport.update({
+  id: '/cows-milk',
+  path: '/cows-milk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EggsRoute = EggsRouteImport.update({
+  id: '/eggs',
+  path: '/eggs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KienyejiChickenRoute = KienyejiChickenRouteImport.update({
+  id: '/kienyeji-chicken',
+  path: '/kienyeji-chicken',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderRoute = OrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SheepRoute = SheepRouteImport.update({
+  id: '/sheep',
+  path: '/sheep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ProductsIndexRoute = ProductsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProductsRoute,
+} as any)
+const ProductsSlugRoute = ProductsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProductsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/cows-milk': typeof CowsMilkRoute
+  '/eggs': typeof EggsRoute
+  '/gallery': typeof GalleryRoute
+  '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/order': typeof OrderRoute
+  '/products': typeof ProductsRouteWithChildren
+  '/sheep': typeof SheepRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/products/': typeof ProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/cows-milk': typeof CowsMilkRoute
+  '/eggs': typeof EggsRoute
+  '/gallery': typeof GalleryRoute
+  '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/order': typeof OrderRoute
+  '/sheep': typeof SheepRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/products': typeof ProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/cows-milk': typeof CowsMilkRoute
+  '/eggs': typeof EggsRoute
+  '/gallery': typeof GalleryRoute
+  '/kienyeji-chicken': typeof KienyejiChickenRoute
+  '/order': typeof OrderRoute
+  '/products': typeof ProductsRouteWithChildren
+  '/sheep': typeof SheepRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/products/$slug': typeof ProductsSlugRoute
+  '/products/': typeof ProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/cows-milk'
+    | '/eggs'
+    | '/gallery'
+    | '/kienyeji-chicken'
+    | '/order'
+    | '/products'
+    | '/sheep'
+    | '/admin'
+    | '/products/$slug'
+    | '/products/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/cows-milk'
+    | '/eggs'
+    | '/gallery'
+    | '/kienyeji-chicken'
+    | '/order'
+    | '/sheep'
+    | '/admin'
+    | '/products/$slug'
+    | '/products'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/cows-milk'
+    | '/eggs'
+    | '/gallery'
+    | '/kienyeji-chicken'
+    | '/order'
+    | '/products'
+    | '/sheep'
+    | '/_authenticated/admin'
+    | '/products/$slug'
+    | '/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
+  CowsMilkRoute: typeof CowsMilkRoute
+  EggsRoute: typeof EggsRoute
+  GalleryRoute: typeof GalleryRoute
+  KienyejiChickenRoute: typeof KienyejiChickenRoute
+  OrderRoute: typeof OrderRoute
+  ProductsRoute: typeof ProductsRouteWithChildren
+  SheepRoute: typeof SheepRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +224,145 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cows-milk': {
+      id: '/cows-milk'
+      path: '/cows-milk'
+      fullPath: '/cows-milk'
+      preLoaderRoute: typeof CowsMilkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eggs': {
+      id: '/eggs'
+      path: '/eggs'
+      fullPath: '/eggs'
+      preLoaderRoute: typeof EggsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kienyeji-chicken': {
+      id: '/kienyeji-chicken'
+      path: '/kienyeji-chicken'
+      fullPath: '/kienyeji-chicken'
+      preLoaderRoute: typeof KienyejiChickenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order': {
+      id: '/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sheep': {
+      id: '/sheep'
+      path: '/sheep'
+      fullPath: '/sheep'
+      preLoaderRoute: typeof SheepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/products/': {
+      id: '/products/'
+      path: '/'
+      fullPath: '/products/'
+      preLoaderRoute: typeof ProductsIndexRouteImport
+      parentRoute: typeof ProductsRoute
+    }
+    '/products/$slug': {
+      id: '/products/$slug'
+      path: '/$slug'
+      fullPath: '/products/$slug'
+      preLoaderRoute: typeof ProductsSlugRouteImport
+      parentRoute: typeof ProductsRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface ProductsRouteChildren {
+  ProductsSlugRoute: typeof ProductsSlugRoute
+  ProductsIndexRoute: typeof ProductsIndexRoute
+}
+
+const ProductsRouteChildren: ProductsRouteChildren = {
+  ProductsSlugRoute: ProductsSlugRoute,
+  ProductsIndexRoute: ProductsIndexRoute,
+}
+
+const ProductsRouteWithChildren = ProductsRoute._addFileChildren(
+  ProductsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
+  AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
+  CowsMilkRoute: CowsMilkRoute,
+  EggsRoute: EggsRoute,
+  GalleryRoute: GalleryRoute,
+  KienyejiChickenRoute: KienyejiChickenRoute,
+  OrderRoute: OrderRoute,
+  ProductsRoute: ProductsRouteWithChildren,
+  SheepRoute: SheepRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
