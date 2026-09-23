@@ -5,4 +5,4 @@
 - [x] Connect persistent orders and contact messages to Lovable Cloud
 - [x] Build authentication and protected farm management pages
 - [x] Add unique SEO metadata across public routes
-- [ ] Verify desktop/mobile pages, navigation, forms, filters, and calculators
+- [x] Verify desktop/mobile pages, navigation, forms, filters, and calculators
