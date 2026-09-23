@@ -1,13 +1,15 @@
 import chickens from "@/assets/kenp-chickens.jpg";
+import oneMonthChicks from "@/assets/kenp-one-month-chicks.jpg";
+import threeMonthChickens from "@/assets/kenp-three-month-chickens.jpg";
 import eggs from "@/assets/kenp-eggs.jpg";
 import dairy from "@/assets/kenp-dairy.jpg";
 import sheep from "@/assets/kenp-sheep.jpg";
 
 export const farmConfig = {
   name: "KENP KIENYEJI FARM",
-  phone: "+254 7XX XXX XXX",
-  whatsapp: "+254 7XX XXX XXX",
-  email: "info@example.com",
+  phone: "0757 430 948",
+  whatsapp: "+254 757 430 948",
+  email: "kiariechulo@gmail.com",
   location: "Kenya",
   tagline: "Quality livestock. Fresh farm products. Trusted service.",
 } as const;
@@ -28,8 +30,8 @@ export type Product = {
 };
 
 export const products: Product[] = [
-  { slug: "one-month-kienyeji-chicks", name: "One-Month-Old Kienyeji Chicks", category: "Poultry", description: "Healthy, active one-month-old indigenous chicks for farmers starting or expanding poultry projects.", details: ["Age: 1 month", "Type: Kienyeji", "Healthy and active", "Suitable for growing poultry projects"], unit: "bird", image: chickens, imageAlt: "Healthy Kienyeji chicks on a Kenyan farm", availability: "Contact to confirm", featured: true },
-  { slug: "three-month-kienyeji-chicken", name: "Three-Month-Old Kienyeji Chicken", category: "Poultry", description: "Established, healthy Kienyeji birds for customers who want a strong start.", details: ["Age: 3 months", "Naturally raised", "Healthy Kienyeji chicken", "Suitable for farmers"], unit: "bird", image: chickens, imageAlt: "Three-month-old Kienyeji chicken in a natural farm environment", availability: "Contact to confirm" },
+  { slug: "one-month-kienyeji-chicks", name: "One-Month-Old Kienyeji Chicks", category: "Poultry", description: "Healthy, active one-month-old indigenous chicks for farmers starting or expanding poultry projects.", details: ["Age: 1 month", "Type: Kienyeji", "Healthy and active", "Suitable for growing poultry projects"], unit: "bird", image: oneMonthChicks, imageAlt: "Group of healthy one-month-old Kienyeji chicks on a Kenyan farm", availability: "Contact to confirm", featured: true },
+  { slug: "three-month-kienyeji-chicken", name: "Three-Month-Old Kienyeji Chickens", category: "Poultry", description: "Established, healthy three-month-old Kienyeji birds for customers who want a strong start.", details: ["Age: 3 months", "Naturally raised", "Healthy Kienyeji chickens", "Suitable for farmers"], unit: "bird", image: threeMonthChickens, imageAlt: "Group of healthy three-month-old Kienyeji chickens on a Kenyan farm", availability: "Contact to confirm" },
   { slug: "mature-kienyeji-cock", name: "Fully Grown Kienyeji Cock", category: "Poultry", description: "A mature, well-cared-for Kienyeji cock suitable for breeding or meat.", details: ["Mature Kienyeji cock", "Suitable for breeding or meat", "Healthy and well cared for"], unit: "bird", image: chickens, imageAlt: "Mature Kienyeji cock for sale in Kenya", availability: "Contact to confirm", featured: true },
   { slug: "mature-kienyeji-hen", name: "Fully Grown Kienyeji Hen", category: "Poultry", description: "A healthy, naturally raised mature hen suitable for breeding and egg production.", details: ["Mature Kienyeji hen", "Suitable for breeding", "Suitable for egg production", "Naturally raised"], unit: "bird", image: chickens, imageAlt: "Mature farm-raised Kienyeji hen", availability: "Contact to confirm" },
   { slug: "kienyeji-eggs", name: "Fresh Kienyeji Eggs", category: "Poultry", description: "Fresh Kienyeji eggs collected from healthy farm-raised hens, available for retail and wholesale customers.", details: ["Less than 5 trays: KSh 600 per tray", "Wholesale: KSh 550 per tray", "Collected from healthy farm-raised hens"], unit: "tray", price: 600, wholesalePrice: 550, image: eggs, imageAlt: "Fresh brown Kienyeji eggs in trays", availability: "Available", featured: true },
