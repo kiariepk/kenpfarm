@@ -16,6 +16,11 @@ export const farmConfig = {
   tagline: "Quality livestock. Fresh farm products. Trusted service.",
 } as const;
 
+export const getWhatsAppUrl = (message?: string) => {
+  const baseUrl = `https://wa.me/${farmConfig.whatsapp}`;
+  return message ? `${baseUrl}?text=${encodeURIComponent(message)}` : baseUrl;
+};
+
 export type Product = {
   slug: string;
   name: string;
