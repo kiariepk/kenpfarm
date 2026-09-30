@@ -10,7 +10,7 @@ import sheep from "@/assets/kenp-sheep.jpg";
 export const farmConfig = {
   name: "KENP KIENYEJI FARM",
   phone: "0757 430 948",
-  whatsapp: "+254 757 430 948",
+  whatsapp: "254757430948",
   email: "kiariechulo@gmail.com",
   location: "Kenya",
   tagline: "Quality livestock. Fresh farm products. Trusted service.",
