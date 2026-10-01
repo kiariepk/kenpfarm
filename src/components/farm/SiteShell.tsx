@@ -6,7 +6,7 @@ import { farmConfig, products } from "@/lib/farm-data";
 
 const nav = [
   ["Home", "/"], ["About Us", "/about"], ["Kienyeji Chicken", "/kienyeji-chicken"], ["Eggs", "/eggs"],
-  ["Cows & Milk", "/cows-milk"], ["Sheep", "/sheep"], ["Farm Products", "/products"], ["Gallery", "/gallery"], ["Contact", "/contact"],
+  ["Cows & Milk", "/cows-milk"], ["Sheep", "/sheep"], ["Farm Products", "/products"], ["Product Finder", "/recommend"], ["Gallery", "/gallery"], ["Contact", "/contact"],
 ] as const;
 
 export function Header() {
