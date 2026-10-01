@@ -20,6 +20,7 @@ import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as KienyejiChickenRouteImport } from './routes/kienyeji-chicken'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as RecommendRouteImport } from './routes/recommend'
 import { Route as SheepRouteImport } from './routes/sheep'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
@@ -79,6 +80,11 @@ const ProductsRoute = ProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecommendRoute = RecommendRouteImport.update({
+  id: '/recommend',
+  path: '/recommend',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SheepRoute = SheepRouteImport.update({
   id: '/sheep',
   path: '/sheep',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/kienyeji-chicken': typeof KienyejiChickenRoute
   '/order': typeof OrderRoute
   '/products': typeof ProductsRouteWithChildren
+  '/recommend': typeof RecommendRoute
   '/sheep': typeof SheepRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/gallery': typeof GalleryRoute
   '/kienyeji-chicken': typeof KienyejiChickenRoute
   '/order': typeof OrderRoute
+  '/recommend': typeof RecommendRoute
   '/sheep': typeof SheepRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/kienyeji-chicken': typeof KienyejiChickenRoute
   '/order': typeof OrderRoute
   '/products': typeof ProductsRouteWithChildren
+  '/recommend': typeof RecommendRoute
   '/sheep': typeof SheepRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/kienyeji-chicken'
     | '/order'
     | '/products'
+    | '/recommend'
     | '/sheep'
     | '/admin'
     | '/products/$slug'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/kienyeji-chicken'
     | '/order'
+    | '/recommend'
     | '/sheep'
     | '/admin'
     | '/products/$slug'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/kienyeji-chicken'
     | '/order'
     | '/products'
+    | '/recommend'
     | '/sheep'
     | '/_authenticated/admin'
     | '/products/$slug'
@@ -212,6 +224,7 @@ export interface RootRouteChildren {
   KienyejiChickenRoute: typeof KienyejiChickenRoute
   OrderRoute: typeof OrderRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  RecommendRoute: typeof RecommendRoute
   SheepRoute: typeof SheepRoute
 }
 
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recommend': {
+      id: '/recommend'
+      path: '/recommend'
+      fullPath: '/recommend'
+      preLoaderRoute: typeof RecommendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sheep': {
       id: '/sheep'
       path: '/sheep'
@@ -362,6 +382,7 @@ const rootRouteChildren: RootRouteChildren = {
   KienyejiChickenRoute: KienyejiChickenRoute,
   OrderRoute: OrderRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  RecommendRoute: RecommendRoute,
   SheepRoute: SheepRoute,
 }
 export const routeTree = rootRouteImport
