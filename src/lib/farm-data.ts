@@ -49,5 +49,5 @@ export const products: Product[] = [
 
 export const categoryImages = { Poultry: chickens, Dairy: dairy, Sheep: sheep } as const;
 export const formatKsh = (value: number) => `KSh ${value.toLocaleString("en-KE")}`;
-export const getPrice = (product: Product, quantity: number, wholesale = false) => product.price ? (wholesale && product.wholesalePrice ? product.wholesalePrice : product.price) * quantity : null;
+export const getPrice = (product: Product, quantity: number, wholesale = false) => product.price ? (wholesale && product.wholesalePrice && quantity >= 5 ? product.wholesalePrice : product.price) * quantity : null;
 export const getProduct = (slug: string) => products.find((product) => product.slug === slug);
