@@ -6,3 +6,5 @@
 - [x] Build authentication and protected farm management pages
 - [x] Add unique SEO metadata across public routes
 - [x] Verify desktop/mobile pages, navigation, forms, filters, and calculators
+- [ ] Build the chosen Bright Harvest / editorial Product Explorer experience using existing farm photos and prices
+- [ ] Audit and fix broken site links; verify key browsing and ordering flows on desktop and mobile
