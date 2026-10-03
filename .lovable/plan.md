@@ -21,6 +21,6 @@ A WhatsApp chat button that stays visible in the bottom corner of every page, so
 - Pure frontend change; no backend, database, or auth work.
 
 ## Verification
-- Click-test the button in the preview on desktop and mobile viewports: it must open `https://wa.me/2575757430948`-formatted chat (https://wa.me/254757430948) in a new tab with the message pre-filled.
+- Click-test the button in the preview on desktop and mobile viewports: it must open `https://wa.me/254757430948` in a new tab with the message pre-filled.
 - Confirm no `api.whatsapp.com` reference is introduced.
 - Check build output is clean and the button does not overlap the mobile navigation or order form buttons.
