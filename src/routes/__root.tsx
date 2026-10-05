@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Header, Footer } from "@/components/farm/SiteShell";
+import { FloatingWhatsApp } from "@/components/farm/FloatingWhatsApp";
 import { Button } from "@/components/ui/button";
 
 import appCss from "../styles.css?url";
