@@ -7,8 +7,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Header, Footer } from "@/components/farm/SiteShell";
+import { FloatingWhatsApp } from "@/components/farm/FloatingWhatsApp";
 import { Button } from "@/components/ui/button";
 
 import appCss from "../styles.css?url";
@@ -31,7 +33,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -111,6 +113,7 @@ function RootComponent() {
       <Header />
       <main><Outlet /></main>
       <Footer />
+      <FloatingWhatsApp />
     </QueryClientProvider>
   );
 }

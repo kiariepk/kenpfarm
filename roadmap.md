@@ -8,3 +8,4 @@
 - [x] Verify desktop/mobile pages, navigation, forms, filters, and calculators
 - [ ] Build the chosen Bright Harvest / editorial Product Explorer experience using existing farm photos and prices
 - [ ] Audit and fix broken site links; verify key browsing and ordering flows on desktop and mobile
+- [x] Add floating WhatsApp chat button on every page (opens wa.me/254757430948)
