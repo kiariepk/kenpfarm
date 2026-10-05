@@ -112,6 +112,7 @@ function RootComponent() {
       <Header />
       <main><Outlet /></main>
       <Footer />
+      <FloatingWhatsApp />
     </QueryClientProvider>
   );
 }
