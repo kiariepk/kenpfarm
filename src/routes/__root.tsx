@@ -107,13 +107,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Standalone pages (hosted under their own address) render without the farm site chrome.
+  const isStandalonePage = pathname === "/the-open-table";
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Header />
+      {!isStandalonePage && <Header />}
       <main><Outlet /></main>
-      <Footer />
-      <FloatingWhatsApp />
+      {!isStandalonePage && <Footer />}
+      {!isStandalonePage && <FloatingWhatsApp />}
     </QueryClientProvider>
   );
 }
