@@ -6,6 +6,7 @@ import threeMonthChickens from "@/assets/kenp-three-month-chickens.jpg";
 import eggs from "@/assets/kenp-eggs.jpg";
 import dairy from "@/assets/kenp-dairy.jpg";
 import sheep from "@/assets/kenp-sheep.jpg";
+import slaughteredChicken from "@/assets/kenp-slaughtered-chicken.png.asset.json";
 
 export const farmConfig = {
   name: "KENP KIENYEJI FARM",
