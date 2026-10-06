@@ -22,6 +22,7 @@ import { Route as OrderRouteImport } from './routes/order'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as RecommendRouteImport } from './routes/recommend'
 import { Route as SheepRouteImport } from './routes/sheep'
+import { Route as TheOpenTableRouteImport } from './routes/the-open-table'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
@@ -90,6 +91,11 @@ const SheepRoute = SheepRouteImport.update({
   path: '/sheep',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TheOpenTableRoute = TheOpenTableRouteImport.update({
+  id: '/the-open-table',
+  path: '/the-open-table',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRouteWithChildren
   '/recommend': typeof RecommendRoute
   '/sheep': typeof SheepRoute
+  '/the-open-table': typeof TheOpenTableRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/products/': typeof ProductsIndexRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/order': typeof OrderRoute
   '/recommend': typeof RecommendRoute
   '/sheep': typeof SheepRoute
+  '/the-open-table': typeof TheOpenTableRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/products': typeof ProductsIndexRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/products': typeof ProductsRouteWithChildren
   '/recommend': typeof RecommendRoute
   '/sheep': typeof SheepRoute
+  '/the-open-table': typeof TheOpenTableRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/products/': typeof ProductsIndexRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/recommend'
     | '/sheep'
+    | '/the-open-table'
     | '/admin'
     | '/products/$slug'
     | '/products/'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/order'
     | '/recommend'
     | '/sheep'
+    | '/the-open-table'
     | '/admin'
     | '/products/$slug'
     | '/products'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/recommend'
     | '/sheep'
+    | '/the-open-table'
     | '/_authenticated/admin'
     | '/products/$slug'
     | '/products/'
@@ -226,6 +238,7 @@ export interface RootRouteChildren {
   ProductsRoute: typeof ProductsRouteWithChildren
   RecommendRoute: typeof RecommendRoute
   SheepRoute: typeof SheepRoute
+  TheOpenTableRoute: typeof TheOpenTableRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -321,6 +334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SheepRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/the-open-table': {
+      id: '/the-open-table'
+      path: '/the-open-table'
+      fullPath: '/the-open-table'
+      preLoaderRoute: typeof TheOpenTableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -384,6 +404,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsRoute: ProductsRouteWithChildren,
   RecommendRoute: RecommendRoute,
   SheepRoute: SheepRoute,
+  TheOpenTableRoute: TheOpenTableRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
