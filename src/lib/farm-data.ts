@@ -2,7 +2,7 @@ import chickens from "@/assets/kenp-chickens.jpg";
 import cockImage from "@/assets/kenp-cock.jpg";
 import henImage from "@/assets/kenp-hen.jpg";
 import oneMonthChicks from "@/assets/kenp-one-month-chicks.jpg";
-import threeMonthChickens from "@/assets/kenp-three-month-chickens.jpg";
+import threeMonthChickens from "@/assets/kenp-three-month-chickens.png.asset.json";
 import eggs from "@/assets/kenp-eggs.jpg";
 import dairy from "@/assets/kenp-dairy.jpg";
 import sheep from "@/assets/kenp-sheep.jpg";
