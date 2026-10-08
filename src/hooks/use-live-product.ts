@@ -11,5 +11,6 @@ export function useLiveProduct(product: Product): Product {
   const [live, setLive] = useState<Live | undefined>();
   useEffect(() => { load().then((m) => setLive(m.get(product.slug))); }, [product.slug]);
   if (!live) return product;
-  return { ...product, price: live.price ?? undefined, wholesalePrice: live.wholesale_price ?? undefined, availability: live.availability };
+  const { price: _p, wholesalePrice: _w, ...rest } = product;
+  return { ...rest, availability: live.availability, ...(live.price != null && { price: Number(live.price) }), ...(live.wholesale_price != null && { wholesalePrice: Number(live.wholesale_price) }) };
 }
