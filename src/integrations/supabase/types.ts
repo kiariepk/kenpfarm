@@ -135,6 +135,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          amount_paid: number | null
           created_at: string
           customer_name: string
           delivery_location: string
@@ -142,11 +143,15 @@ export type Database = {
           estimated_total: number | null
           id: string
           message: string | null
+          mpesa_code: string | null
+          payment_method: string | null
+          payment_status: string
           phone: string
           preferred_delivery_date: string | null
           status: Database["public"]["Enums"]["order_status"]
         }
         Insert: {
+          amount_paid?: number | null
           created_at?: string
           customer_name: string
           delivery_location: string
@@ -154,11 +159,15 @@ export type Database = {
           estimated_total?: number | null
           id?: string
           message?: string | null
+          mpesa_code?: string | null
+          payment_method?: string | null
+          payment_status?: string
           phone: string
           preferred_delivery_date?: string | null
           status?: Database["public"]["Enums"]["order_status"]
         }
         Update: {
+          amount_paid?: number | null
           created_at?: string
           customer_name?: string
           delivery_location?: string
@@ -166,6 +175,9 @@ export type Database = {
           estimated_total?: number | null
           id?: string
           message?: string | null
+          mpesa_code?: string | null
+          payment_method?: string | null
+          payment_status?: string
           phone?: string
           preferred_delivery_date?: string | null
           status?: Database["public"]["Enums"]["order_status"]
@@ -246,6 +258,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_first_admin: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -1,9 +1,11 @@
+import { useLiveProduct } from "@/hooks/use-live-product";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatKsh, type Product } from "@/lib/farm-data";
 
-export function ProductCard({ product, wide = false }: { product: Product; wide?: boolean }) {
+export function ProductCard({ product: base, wide = false }: { product: Product; wide?: boolean }) {
+  const product = useLiveProduct(base);
   return <article className={`group overflow-hidden rounded-md border border-border bg-card transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg ${wide ? "lg:col-span-2 lg:flex" : ""}`}>
     <Link to="/products/$slug" params={{ slug: product.slug }} className={`block overflow-hidden ${wide ? "lg:w-[55%] lg:shrink-0" : ""}`}>
       <img src={product.image} alt={product.imageAlt} loading="lazy" width={800} height={600} className={`w-full object-cover transition duration-500 group-hover:scale-[1.03] ${wide ? "aspect-[4/3] lg:h-full lg:aspect-auto" : "aspect-[4/3]"}`} />
