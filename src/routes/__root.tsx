@@ -12,6 +12,7 @@ import type { ErrorComponentProps } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Header, Footer } from "@/components/farm/SiteShell";
 import { FloatingWhatsApp } from "@/components/farm/FloatingWhatsApp";
+import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 
 import appCss from "../styles.css?url";
@@ -118,6 +119,7 @@ function RootComponent() {
       <main><Outlet /></main>
       {!isStandalonePage && <Footer />}
       {!isStandalonePage && <FloatingWhatsApp />}
+      <Toaster />
     </QueryClientProvider>
   );
 }
