@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Endgame &middot; A Chess App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.min.js" as="fetch" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<style>
+  :root{
+    --walnut-dark:#241510;
+    --walnut-mid:#3B2618;
+    --walnut-panel:#2F1D14;
+    --square-light:#EDE1CB;
+    --square-dark:#6B4A34;
+    --felt:#173328;
+    --felt-light:#1F4335;
+    --ivory:#F2E9D8;
+    --brass:#BC9552;
+    --brass-light:#E0C480;
+    --ink:#181210;
+    --check-red:#B24A3E;
+    --muted:#9C8A76;
+    --last-light:#8AA678;
+    --last-dark:#5C7A4E;
+    --piece-white:#FBF6EA;
+    --piece-white-line:#6b5636;
+    --piece-black:#161210;
+    --piece-black-line:#4a3a26;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    background:
+      radial-gradient(ellipse at top, #35211581 0%, transparent 60%),
+      var(--walnut-dark);
+    color:var(--ivory);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:2.5rem 1.5rem 4rem;
+  }
+
+  /* ── HEADER ── */
+  header{
+    text-align:center;
+    margin-bottom:2.2rem;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:0.6rem;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:2.6rem;
+    letter-spacing:0.01em;
+    color:var(--ivory);
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--brass-light);
+  }
+  .subtitle{
+    font-size:0.88rem;
+    color:var(--muted);
+    margin-top:0.5rem;
+    font-weight:400;
+  }
+
+  /* ── LAYOUT ── */
+  .layout{
+    display:grid;
+    grid-template-columns:230px auto 280px;
+    gap:2rem;
+    align-items:start;
+    max-width:1180px;
+    width:100%;
+  }
+  @media (max-width:980px){
+    .layout{grid-template-columns:1fr; justify-items:center;}
+    .controls, .scoresheet{width:100%; max-width:420px;}
+  }
+
+  .panel{
+    background:linear-gradient(180deg, var(--walnut-panel), var(--walnut-mid));
+    border:1px solid #55402c;
+    border-radius:6px;
+    padding:1.3rem;
+  }
+
+  /* ── CONTROLS ── */
+  .controls h2, .scoresheet h2{
+    font-family:'Fraunces', serif;
+    font-size:1rem;
+    font-weight:600;
+    color:var(--brass-light);
+    margin-bottom:0.9rem;
+    letter-spacing:0.02em;
+  }
+  .seg{
+    display:flex;
+    border:1px solid #55402c;
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:1.1rem;
+  }
+  .seg button{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:var(--muted);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.72rem;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:0.6rem 0.3rem;
+    cursor:pointer;
+    transition:all 0.2s;
+  }
+  .seg button.active{
+    background:var(--brass);
+    color:var(--ink);
+  }
+  .field{margin-bottom:1.1rem;}
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:0.45rem;
+  }
+  select{
+    width:100%;
+    background:var(--walnut-dark);
+    color:var(--ivory);
+    border:1px solid #55402c;
+    border-radius:4px;
+    padding:0.55rem 0.6rem;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.82rem;
+  }
+  .btn{
+    width:100%;
+    background:transparent;
+    border:1px solid var(--brass);
+    color:var(--brass-light);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.78rem;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:0.65rem;
+    border-radius:4px;
+    cursor:pointer;
+    margin-bottom:0.7rem;
+    transition:all 0.2s;
+  }
+  .btn:hover{background:var(--brass); color:var(--ink);}
+  .btn:disabled{opacity:0.35; cursor:default;}
+  .btn:disabled:hover{background:transparent; color:var(--brass-light);}
+  .btn-primary{background:var(--brass); color:var(--ink);}
+  .btn-primary:hover{background:var(--brass-light);}
+
+  .field input[type="number"]{
+    width:100%;
+    background:var(--walnut-dark);
+    color:var(--ivory);
+    border:1px solid #55402c;
+    border-radius:4px;
+    padding:0.55rem 0.6rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+  }
+  .field select:disabled, .field input:disabled{opacity:0.4; cursor:default;}
+
+  /* ── CHESS CLOCKS ── */
+  .clock-box{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    max-width:480px;
+    background:var(--walnut-panel);
+    border:1px solid #55402c;
+    border-radius:6px;
+    padding:0.5rem 0.9rem;
+    margin:0.6rem 0;
+    transition:background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .clock-box.hidden{display:none;}
+  .clock-box.active{
+    border-color:var(--brass);
+    box-shadow:0 0 0 1px rgba(188,149,82,0.25), 0 0 18px rgba(188,149,82,0.18);
+  }
+  .clock-box.inactive .clock-time{opacity:0.55;}
+  .clock-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .clock-time{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:1.4rem;
+    font-weight:600;
+    color:var(--ivory);
+    letter-spacing:0.02em;
+    font-variant-numeric:tabular-nums;
+  }
+  .clock-box.low-time .clock-time{
+    color:#D9695C;
+    animation:clock-pulse 1s ease-in-out infinite;
+  }
+  @keyframes clock-pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.5;}
+  }
+
+  .status-box{
+    margin-top:1.2rem;
+    padding:0.8rem 0.9rem;
+    border-radius:4px;
+    background:var(--felt);
+    border:1px solid var(--felt-light);
+    font-size:0.82rem;
+    line-height:1.45;
+    min-height:2.6rem;
+    display:flex;
+    align-items:center;
+  }
+  .status-box.alert{
+    background:#3a1e1a;
+    border-color:var(--check-red);
+    color:#F0C9C0;
+  }
+  .turn-dot{
+    width:9px; height:9px; border-radius:50%;
+    display:inline-block; margin-right:0.55rem; flex-shrink:0;
+  }
+  .turn-dot.w{background:var(--ivory); box-shadow:0 0 6px var(--ivory);}
+  .turn-dot.b{background:#000; border:1px solid var(--muted);}
+
+  /* ── BOARD ── */
+  .board-wrap{display:flex; flex-direction:column; align-items:center;}
+  .board-frame{
+    background:linear-gradient(155deg, #5C3D26, #3B2618 60%);
+    border-radius:8px;
+    padding:1.1rem;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px #6b4a2e;
+    position:relative;
+  }
+  .board{
+    display:grid;
+    grid-template-columns:repeat(8, minmax(38px,64px));
+    grid-template-rows:repeat(8, minmax(38px,64px));
+    border:2px solid var(--brass);
+    border-radius:2px;
+    overflow:hidden;
+    box-shadow:0 4px 18px rgba(0,0,0,0.45);
+  }
+  .sq{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    user-select:none;
+  }
+  .sq.light{
+    background:var(--square-light);
+    background-image:linear-gradient(160deg, rgba(255,255,255,0.12), rgba(0,0,0,0.03));
+  }
+  .sq.dark{
+    background:var(--square-dark);
+    background-image:linear-gradient(160deg, rgba(255,255,255,0.06), rgba(0,0,0,0.14));
+  }
+  .sq.selected{box-shadow:inset 0 0 0 3px var(--brass);}
+  .sq.last{background-color:var(--last-light);}
+  .sq.last.dark{background-color:var(--last-dark);}
+  .sq.check{box-shadow:inset 0 0 0 3px var(--check-red), inset 0 0 22px rgba(178,74,62,0.55);}
+  .sq .dot{
+    width:22%; height:22%; border-radius:50%;
+    background:rgba(60,40,20,0.42);
+  }
+  .sq.capture-hint{box-shadow:inset 0 0 0 3px rgba(60,40,20,0.5);}
+  .piece{
+    font-size:clamp(1.6rem, 4.4vw, 2.6rem);
+    line-height:1;
+    transition:transform 0.08s;
+    filter:drop-shadow(0 2px 1px rgba(0,0,0,0.35));
+  }
+  .piece.white{color:var(--piece-white); -webkit-text-stroke:1px var(--piece-white-line);}
+  .piece.black{color:var(--piece-black); -webkit-text-stroke:0.5px var(--piece-black-line);}
+
+  .piece-figure{
+    width:78%;
+    height:78%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform 0.1s;
+    pointer-events:none;
+  }
+  .sq:hover .piece-figure{transform:translateY(-3px);}
+  .piece-svg{width:100%; height:100%; display:block; overflow:visible;
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,0.4));}
+  .piece-glyph{paint-order:stroke fill;}
+  .pg-white{fill:var(--piece-white); stroke:var(--piece-white-line); stroke-width:2px;}
+  .pg-black{fill:var(--piece-black); stroke:var(--piece-black-line); stroke-width:1.4px;}
+  .piece-shadow-ellipse{fill:rgba(0,0,0,0.32);}
+  .piece-gloss{fill:rgba(255,255,255,0.32); filter:blur(1.5px);}
+
+  .coord-files, .coord-ranks{
+    display:flex;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem;
+    color:var(--brass);
+    letter-spacing:0.05em;
+  }
+  .coord-files{justify-content:space-around; padding:0.4rem 0 0 0; padding-left:2px;}
+  .coord-files span{width:100%; text-align:center;}
+
+  /* ── SCORESHEET ── */
+  .trays{display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.2rem;}
+  .tray{
+    background:var(--felt);
+    border:1px solid var(--felt-light);
+    border-radius:4px;
+    padding:0.55rem 0.7rem;
+    min-height:2.4rem;
+  }
+  .tray-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.6rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:0.3rem;
+  }
+  .tray-pieces{font-size:1.15rem; line-height:1; letter-spacing:0.06em;}
+  .tray-pieces .piece{font-size:1.15rem; filter:none;}
+
+  .movelist{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    max-height:260px;
+    overflow-y:auto;
+    border-top:1px dashed #55402c;
+    padding-top:0.6rem;
+  }
+  .movelist::-webkit-scrollbar{width:6px;}
+  .movelist::-webkit-scrollbar-thumb{background:var(--brass); border-radius:3px;}
+  .move-row{
+    display:grid;
+    grid-template-columns:2rem 1fr 1fr;
+    padding:0.28rem 0.15rem;
+    color:var(--ivory);
+    border-bottom:1px solid #33241a;
+  }
+  .move-row .num{color:var(--muted);}
+  .movelist .empty{color:var(--muted); font-family:'IBM Plex Sans',sans-serif; font-size:0.78rem; padding:0.3rem 0.1rem;}
+
+  footer{
+    margin-top:2.5rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .piece, .sq{transition:none;}
+  }
+
+  /* ── SETTINGS BUTTON & MODAL ── */
+  .settings-btn{
+    position:fixed;
+    top:1.6rem;
+    right:1.8rem;
+    width:42px; height:42px;
+    border-radius:50%;
+    background:var(--walnut-panel);
+    border:1px solid #55402c;
+    color:var(--brass-light);
+    font-size:1.15rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.2s;
+    z-index:50;
+  }
+  .settings-btn:hover{background:var(--brass); color:var(--ink); transform:rotate(35deg);}
+
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(15,9,6,0.68);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:1.5rem;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:linear-gradient(180deg, var(--walnut-panel), var(--walnut-mid));
+    border:1px solid #55402c;
+    border-radius:8px;
+    padding:1.6rem;
+    max-width:520px;
+    width:100%;
+    max-height:80vh;
+    overflow-y:auto;
+    box-shadow:0 30px 60px rgba(0,0,0,0.55);
+  }
+  .modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:1.2rem;
+  }
+  .modal-head h2{
+    font-family:'Fraunces', serif;
+    font-size:1.2rem;
+    font-weight:600;
+    color:var(--brass-light);
+  }
+  .modal-close{
+    background:none; border:none;
+    color:var(--muted);
+    font-size:1.3rem;
+    cursor:pointer;
+    line-height:1;
+    padding:0.2rem;
+  }
+  .modal-close:hover{color:var(--ivory);}
+  .modal-sub{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:0.9rem;
+  }
+  .theme-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:0.9rem;
+    margin-bottom:0.6rem;
+  }
+  .theme-card{
+    background:var(--walnut-dark);
+    border:2px solid transparent;
+    border-radius:6px;
+    padding:0.55rem;
+    cursor:pointer;
+    text-align:center;
+    transition:border-color 0.15s, transform 0.15s;
+  }
+  .theme-card:hover{transform:translateY(-2px);}
+  .theme-card.active{border-color:var(--brass);}
+  .theme-swatch{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    grid-template-rows:repeat(2, 1fr);
+    width:100%;
+    aspect-ratio:2/1;
+    border-radius:3px;
+    overflow:hidden;
+    margin-bottom:0.5rem;
+    box-shadow:0 2px 6px rgba(0,0,0,0.35);
+  }
+  .theme-name{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.72rem;
+    font-weight:600;
+    color:var(--ivory);
+  }
+
+  /* ── CHECKMATE CELEBRATION ── */
+  #confetti-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:150;
+  }
+  .mate-overlay{
+    position:fixed;
+    inset:0;
+    background:radial-gradient(ellipse at center, rgba(23,51,40,0.55) 0%, rgba(15,9,6,0.82) 70%);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:140;
+    padding:1.5rem;
+    opacity:0;
+    transition:opacity 0.5s ease;
+  }
+  .mate-overlay.open{display:flex;}
+  .mate-overlay.show{opacity:1;}
+  .mate-card{
+    position:relative;
+    background:linear-gradient(180deg, var(--walnut-panel), var(--walnut-mid));
+    border:1px solid var(--brass);
+    border-radius:10px;
+    padding:2.6rem 2.4rem 2.2rem;
+    max-width:420px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 0 0 1px rgba(188,149,82,0.15), 0 40px 90px rgba(0,0,0,0.6), 0 0 60px rgba(188,149,82,0.12);
+    transform:scale(0.82) translateY(18px);
+    transition:transform 0.55s cubic-bezier(0.16,1.4,0.4,1);
+  }
+  .mate-overlay.show .mate-card{
+    transform:scale(1) translateY(0);
+  }
+  .mate-crown{
+    font-size:3.2rem;
+    line-height:1;
+    margin-bottom:0.9rem;
+    filter:drop-shadow(0 0 18px rgba(224,196,128,0.55));
+    animation:mate-bob 2.4s ease-in-out infinite;
+  }
+  @keyframes mate-bob{
+    0%,100%{transform:translateY(0) rotate(-2deg);}
+    50%{transform:translateY(-8px) rotate(2deg);}
+  }
+  .mate-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:0.5rem;
+  }
+  .mate-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:2rem;
+    color:var(--ivory);
+    margin-bottom:0.4rem;
+  }
+  .mate-title em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--brass-light);
+  }
+  .mate-sub{
+    font-size:0.9rem;
+    color:var(--muted);
+    margin-bottom:1.8rem;
+    line-height:1.5;
+  }
+  .mate-actions{
+    display:flex;
+    gap:0.7rem;
+    justify-content:center;
+  }
+  .mate-actions .btn{
+    margin-bottom:0;
+    flex:1;
+  }
+  .mate-close{
+    position:absolute;
+    top:0.7rem;
+    right:0.8rem;
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:1.3rem;
+    cursor:pointer;
+    line-height:1;
+    padding:0.2rem;
+  }
+  .mate-close:hover{color:var(--ivory);}
+
+  /* ── COACH ── */
+  .coach-panel{
+    max-width:1180px;
+    width:100%;
+    margin-top:1.6rem;
+  }
+  .coach-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:1rem;
+    flex-wrap:wrap;
+    gap:0.8rem;
+  }
+  .coach-head-left{
+    display:flex;
+    align-items:center;
+    gap:0.7rem;
+  }
+  .coach-head h2{
+    font-family:'Fraunces', serif;
+    font-size:1rem;
+    font-weight:600;
+    color:var(--brass-light);
+    letter-spacing:0.02em;
+  }
+  .coach-elo{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.62rem;
+    letter-spacing:0.1em;
+    color:var(--ink);
+    background:linear-gradient(180deg, var(--brass-light), var(--brass));
+    padding:0.2rem 0.5rem;
+    border-radius:20px;
+    font-weight:600;
+  }
+  .coach-toggle-wrap{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .toggle{
+    position:relative;
+    width:38px;
+    height:20px;
+    background:var(--walnut-dark);
+    border:1px solid #55402c;
+    border-radius:20px;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:background 0.2s;
+  }
+  .toggle.on{background:var(--felt-light); border-color:var(--last-dark);}
+  .toggle-knob{
+    position:absolute;
+    top:1px; left:1px;
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--muted);
+    transition:transform 0.2s, background 0.2s;
+  }
+  .toggle.on .toggle-knob{
+    transform:translateX(18px);
+    background:var(--brass-light);
+  }
+  .coach-body{
+    display:grid;
+    grid-template-columns:1fr 2fr;
+    gap:1.6rem;
+    align-items:center;
+  }
+  @media (max-width:700px){
+    .coach-body{grid-template-columns:1fr;}
+  }
+  .eval-block{display:flex; align-items:center; gap:0.8rem;}
+  .eval-bar-track{
+    position:relative;
+    width:14px;
+    height:120px;
+    border-radius:4px;
+    overflow:hidden;
+    background:var(--piece-black);
+    border:1px solid #55402c;
+    flex-shrink:0;
+  }
+  .eval-bar-fill{
+    position:absolute;
+    bottom:0; left:0; width:100%;
+    background:var(--piece-white);
+    height:50%;
+    transition:height 0.5s ease;
+  }
+  .eval-bar-mid{
+    position:absolute;
+    left:0; right:0; top:50%;
+    height:1px;
+    background:rgba(188,149,82,0.5);
+  }
+  .eval-readout{display:flex; flex-direction:column; gap:0.2rem;}
+  .eval-score{
+    font-family:'Fraunces', serif;
+    font-size:1.5rem;
+    font-weight:600;
+    color:var(--ivory);
+  }
+  .eval-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .coach-move-block{
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+  }
+  .coach-status-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+  .coach-spinner{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--brass);
+    animation:coach-pulse 1s ease-in-out infinite;
+  }
+  @keyframes coach-pulse{
+    0%,100%{opacity:0.3; transform:scale(0.8);}
+    50%{opacity:1; transform:scale(1.15);}
+  }
+  .best-move-row{
+    display:flex;
+    align-items:baseline;
+    gap:0.7rem;
+    flex-wrap:wrap;
+  }
+  .best-move-chip{
+    font-family:'Fraunces', serif;
+    font-size:1.35rem;
+    font-weight:600;
+    color:var(--brass-light);
+    background:rgba(188,149,82,0.12);
+    border:1px solid rgba(188,149,82,0.4);
+    border-radius:6px;
+    padding:0.25rem 0.75rem;
+  }
+  .best-move-desc{
+    font-size:0.8rem;
+    color:var(--muted);
+  }
+  .coach-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:var(--muted);
+    line-height:1.6;
+    word-break:break-word;
+  }
+  .coach-line strong{color:var(--ivory); font-weight:600;}
+  .coach-off-msg{
+    font-size:0.82rem;
+    color:var(--muted);
+    font-style:italic;
+  }
+  #coach-arrow-layer{
+    position:absolute;
+    inset:1.1rem;
+    pointer-events:none;
+    z-index:5;
+  }
+  .sq.coach-from{box-shadow:inset 0 0 0 3px rgba(188,149,82,0.65);}
+  .sq.coach-to{box-shadow:inset 0 0 0 3px rgba(224,196,128,0.9);}
+
+  /* ── CUSTOM PIECE COLORS ── */
+  .modal-divider{
+    border:none;
+    border-top:1px solid rgba(188,149,82,0.25);
+    margin:1.2rem 0 1rem;
+  }
+  .section-label{
+    font-family:'Fraunces', serif;
+    font-size:0.95rem;
+    font-weight:600;
+    color:var(--brass-light);
+    margin-bottom:0.7rem;
+  }
+  .color-picker-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0.9rem;
+    margin-bottom:0.7rem;
+  }
+  .color-picker-item{
+    background:var(--walnut-dark);
+    border:1px solid #55402c;
+    border-radius:6px;
+    padding:0.6rem 0.7rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:0.6rem;
+  }
+  .color-picker-label{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.78rem;
+    font-weight:500;
+    color:var(--ivory);
+  }
+  .color-swatch-input{
+    -webkit-appearance:none;
+    appearance:none;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:2px solid rgba(188,149,82,0.5);
+    padding:0;
+    cursor:pointer;
+    background:none;
+    flex-shrink:0;
+  }
+  .color-swatch-input::-webkit-color-swatch-wrapper{padding:0; border-radius:50%;}
+  .color-swatch-input::-webkit-color-swatch{border:none; border-radius:50%;}
+  .color-swatch-input::-moz-color-swatch{border:none; border-radius:50%;}
+  .custom-colors-actions{
+    display:flex;
+    gap:0.6rem;
+  }
+  .custom-colors-actions .btn{
+    margin-bottom:0;
+    flex:1;
+    font-size:0.7rem;
+    padding:0.55rem 0.8rem;
+  }
+  .swap-btn{
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid #55402c;
+    background:var(--walnut-dark);
+    color:var(--muted);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.95rem;
+    flex-shrink:0;
+  }
+  .swap-btn:hover{color:var(--ivory); border-color:var(--brass);}
+</style>
+</head>
+<body>
+
+<button class="settings-btn" id="settings-btn" title="Board theme" aria-label="Open board theme settings">&#9881;</button>
+
+<header>
+  <div class="eyebrow">Sixty-Four Squares</div>
+  <h1>The <em>Endgame</em> Table</h1>
+  <p class="subtitle">A quiet board for a slow game.</p>
+</header>
+
+<div class="layout">
+
+  <!-- CONTROLS -->
+  <aside class="panel controls">
+    <h2>Set the Board</h2>
+    <div class="field">
+      <label>Opponent</label>
+      <div class="seg" id="mode-seg">
+        <button data-mode="ai" class="active">Computer</button>
+        <button data-mode="two">Two Player</button>
+      </div>
+    </div>
+    <div class="field" id="difficulty-field">
+      <label>Difficulty</label>
+      <select id="difficulty">
+        <option value="1">Easy</option>
+        <option value="2" selected>Medium</option>
+        <option value="3">Hard</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Time Control</label>
+      <select id="time-control">
+        <optgroup label="Bullet">
+          <option value="1|0">1 min</option>
+          <option value="2|1">2 | 1</option>
+        </optgroup>
+        <optgroup label="Blitz">
+          <option value="3|0">3 min</option>
+          <option value="3|2">3 | 2</option>
+          <option value="5|0" selected>5 min</option>
+          <option value="5|3">5 | 3</option>
+        </optgroup>
+        <optgroup label="Rapid">
+          <option value="10|0">10 min</option>
+          <option value="15|10">15 | 10</option>
+          <option value="30|0">30 min</option>
+        </optgroup>
+        <option value="0|0">No Clock</option>
+        <option value="custom">Custom&hellip;</option>
+      </select>
+    </div>
+    <div class="field custom-time-fields" id="custom-time-fields" style="display:none;">
+      <label>Minutes per side</label>
+      <input type="number" id="custom-minutes" min="0.5" max="180" step="0.5" value="5">
+      <label style="margin-top:0.5rem;">Increment (seconds)</label>
+      <input type="number" id="custom-increment" min="0" max="60" step="1" value="0">
+    </div>
+    <button class="btn btn-primary" id="new-game">New Game</button>
+    <button class="btn" id="undo">Undo Move</button>
+
+    <div class="status-box" id="status">
+      <span class="turn-dot w"></span><span id="status-text">White to move.</span>
+    </div>
+  </aside>
+
+  <!-- BOARD -->
+  <div class="board-wrap">
+    <div class="clock-box" id="clock-black">
+      <span class="clock-label">Black</span>
+      <span class="clock-time" id="clock-black-time">5:00</span>
+    </div>
+    <div class="board-frame">
+      <div class="board" id="board"></div>
+      <div class="coord-files" id="coord-files"></div>
+      <svg id="coach-arrow-layer"></svg>
+    </div>
+    <div class="clock-box active" id="clock-white">
+      <span class="clock-label">White</span>
+      <span class="clock-time" id="clock-white-time">5:00</span>
+    </div>
+  </div>
+
+  <!-- SCORESHEET -->
+  <aside class="panel scoresheet">
+    <h2>Scoresheet</h2>
+    <div class="trays">
+      <div class="tray">
+        <div class="tray-label">White has captured</div>
+        <div class="tray-pieces" id="captured-by-white">&nbsp;</div>
+      </div>
+      <div class="tray">
+        <div class="tray-label">Black has captured</div>
+        <div class="tray-pieces" id="captured-by-black">&nbsp;</div>
+      </div>
+    </div>
+    <div class="movelist" id="movelist">
+      <div class="empty">No moves yet — make the first move.</div>
+    </div>
+  </aside>
+
+</div>
+
+<section class="panel coach-panel" id="coach-panel">
+  <div class="coach-head">
+    <div class="coach-head-left">
+      <h2>Coach</h2>
+      <span class="coach-elo">ELO 4000 &middot; MAX STRENGTH</span>
+    </div>
+    <div class="coach-toggle-wrap">
+      <span id="voice-toggle-label">Voice off</span>
+      <div class="toggle" id="voice-toggle"><div class="toggle-knob"></div></div>
+    </div>
+    <div class="coach-toggle-wrap">
+      <span id="coach-toggle-label">Analysis on</span>
+      <div class="toggle on" id="coach-toggle"><div class="toggle-knob"></div></div>
+    </div>
+  </div>
+  <div class="coach-body" id="coach-body">
+    <div class="eval-block">
+      <div class="eval-bar-track">
+        <div class="eval-bar-mid"></div>
+        <div class="eval-bar-fill" id="eval-bar-fill"></div>
+      </div>
+      <div class="eval-readout">
+        <div class="eval-score" id="eval-score">0.00</div>
+        <div class="eval-label" id="eval-label">Even position</div>
+      </div>
+    </div>
+    <div class="coach-move-block">
+      <div class="coach-status-line" id="coach-status-line">
+        <span class="coach-spinner" id="coach-spinner"></span>
+        <span id="coach-status-text">Warming up the engine&hellip;</span>
+      </div>
+      <div class="best-move-row">
+        <div class="best-move-chip" id="best-move-chip">&mdash;</div>
+        <div class="best-move-desc" id="best-move-desc">Best move will appear here.</div>
+      </div>
+      <div class="coach-line" id="coach-line"></div>
+    </div>
+  </div>
+</section>
+
+<footer>PROMOTIONS AUTO-QUEEN &middot; CLICK A PIECE, THEN A LIT SQUARE</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Board Themes</h2>
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <p class="modal-sub">Choose a look for the board</p>
+    <div class="theme-grid" id="theme-grid"></div>
+
+    <hr class="modal-divider">
+
+    <div class="section-label">Custom Piece Colors</div>
+    <div class="color-picker-row">
+      <div class="color-picker-item">
+        <span class="color-picker-label">White Pieces</span>
+        <input type="color" class="color-swatch-input" id="custom-white-color" value="#FBF6EA">
+      </div>
+      <div class="color-picker-item">
+        <span class="color-picker-label">Black Pieces</span>
+        <input type="color" class="color-swatch-input" id="custom-black-color" value="#161210">
+      </div>
+    </div>
+    <div class="custom-colors-actions">
+      <button class="swap-btn" id="swap-piece-colors" title="Swap colors">&#8646;</button>
+      <button class="btn" id="reset-piece-colors">Reset to Theme</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="mate-overlay" id="mate-overlay">
+  <div class="mate-card">
+    <button class="mate-close" id="mate-close" aria-label="Close">&times;</button>
+    <div class="mate-crown" id="mate-crown">&#9812;</div>
+    <div class="mate-eyebrow">Checkmate</div>
+    <div class="mate-title" id="mate-title"><em>White</em> wins</div>
+    <div class="mate-sub" id="mate-sub">The king has nowhere left to run.</div>
+    <div class="mate-actions">
+      <button class="btn" id="mate-dismiss">Study the Board</button>
+      <button class="btn btn-primary" id="mate-newgame">New Game</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const files = ['a','b','c','d','e','f','g','h'];
+const boardEl = document.getElementById('board');
+const coordFilesEl = document.getElementById('coord-files');
+const statusBox = document.getElementById('status');
+const statusText = document.getElementById('status-text');
+const movelistEl = document.getElementById('movelist');
+const capWhiteEl = document.getElementById('captured-by-white');
+const capBlackEl = document.getElementById('captured-by-black');
+const modeSeg = document.getElementById('mode-seg');
+const difficultyField = document.getElementById('difficulty-field');
+const difficultySelect = document.getElementById('difficulty');
+const undoBtn = document.getElementById('undo');
+
+const timeControlSelect = document.getElementById('time-control');
+const customTimeFields = document.getElementById('custom-time-fields');
+const customMinutesInput = document.getElementById('custom-minutes');
+const customIncrementInput = document.getElementById('custom-increment');
+const clockBlackBox = document.getElementById('clock-black');
+const clockWhiteBox = document.getElementById('clock-white');
+const clockBlackTimeEl = document.getElementById('clock-black-time');
+const clockWhiteTimeEl = document.getElementById('clock-white-time');
+
+const THEMES = {
+  walnut: {
+    name:'Walnut', squareLight:'#EDE1CB', squareDark:'#6B4A34',
+    lastLight:'#8AA678', lastDark:'#5C7A4E',
+    pieceWhite:'#FBF6EA', pieceWhiteLine:'#6b5636',
+    pieceBlack:'#161210', pieceBlackLine:'#4a3a26'
+  },
+  classicGreen: {
+    name:'Classic Green', squareLight:'#EEEED2', squareDark:'#769656',
+    lastLight:'#F6F669', lastDark:'#BACA44',
+    pieceWhite:'#FDFDF9', pieceWhiteLine:'#5a5a4a',
+    pieceBlack:'#161512', pieceBlackLine:'#3d3d33'
+  },
+  tournamentBlue: {
+    name:'Tournament Blue', squareLight:'#DEE7F0', squareDark:'#4C6E96',
+    lastLight:'#A8CBE0', lastDark:'#6E9BC0',
+    pieceWhite:'#FBFCFE', pieceWhiteLine:'#3d5670',
+    pieceBlack:'#111820', pieceBlackLine:'#2b3947'
+  },
+  midnight: {
+    name:'Midnight', squareLight:'#3E4657', squareDark:'#1C2029',
+    lastLight:'#5A6B8C', lastDark:'#333E56',
+    pieceWhite:'#E9EDF5', pieceWhiteLine:'#7d8aa3',
+    pieceBlack:'#0A0C10', pieceBlackLine:'#2a3040'
+  },
+  coral: {
+    name:'Coral Reef', squareLight:'#FBE3D6', squareDark:'#D97757',
+    lastLight:'#FFD8A8', lastDark:'#E3A15E',
+    pieceWhite:'#FFFBF6', pieceWhiteLine:'#8a5a3f',
+    pieceBlack:'#241109', pieceBlackLine:'#5c2f1c'
+  },
+  ivoryMarble: {
+    name:'Ivory Marble', squareLight:'#F7F3EA', squareDark:'#BFB6A6',
+    lastLight:'#E8DCC0', lastDark:'#C9B98D',
+    pieceWhite:'#FFFEFB', pieceWhiteLine:'#8c8574',
+    pieceBlack:'#211E19', pieceBlackLine:'#4a453a'
+  },
+  ebony: {
+    name:'Ebony', squareLight:'#8A8A8A', squareDark:'#2B2B2B',
+    lastLight:'#B08D57', lastDark:'#75603A',
+    pieceWhite:'#F5F5F0', pieceWhiteLine:'#5c5c58',
+    pieceBlack:'#0B0B0B', pieceBlackLine:'#2e2e2b'
+  },
+  sandstone: {
+    name:'Sandstone', squareLight:'#F0DFC2', squareDark:'#A9834F',
+    lastLight:'#E9C983', lastDark:'#C7A052',
+    pieceWhite:'#FFFCF4', pieceWhiteLine:'#7a5f38',
+    pieceBlack:'#2A1D0E', pieceBlackLine:'#513c1f'
+  }
+};
+let currentTheme = 'walnut';
+let customPieceColors = { white: null, black: null };
+
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const num = parseInt(hex,16);
+  return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+}
+function rgbToHex(r,g,b){
+  return '#' + [r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+}
+function adjustHex(hex, amt){
+  // amt in -1..1: negative darkens toward black, positive lightens toward white
+  const {r,g,b} = hexToRgb(hex);
+  const target = amt>0 ? 255 : 0;
+  const t = Math.abs(amt);
+  return rgbToHex(r+(target-r)*t, g+(target-g)*t, b+(target-b)*t);
+}
+function hexLuminance(hex){
+  const {r,g,b} = hexToRgb(hex);
+  return (0.299*r + 0.587*g + 0.114*b)/255;
+}
+function deriveOutlineColor(hex){
+  // light fills get a darker outline, dark fills get a lighter one — keeps the piece edge readable regardless of the color picked
+  const amt = hexLuminance(hex) > 0.5 ? -0.55 : 0.55;
+  return adjustHex(hex, amt);
+}
+
+function applyCustomPieceColors(){
+  const t = THEMES[currentTheme];
+  const root = document.documentElement.style;
+  const whiteColor = customPieceColors.white || t.pieceWhite;
+  const blackColor = customPieceColors.black || t.pieceBlack;
+  root.setProperty('--piece-white', whiteColor);
+  root.setProperty('--piece-white-line', customPieceColors.white ? deriveOutlineColor(whiteColor) : t.pieceWhiteLine);
+  root.setProperty('--piece-black', blackColor);
+  root.setProperty('--piece-black-line', customPieceColors.black ? deriveOutlineColor(blackColor) : t.pieceBlackLine);
+}
+
+function applyTheme(key){
+  const t = THEMES[key];
+  if(!t) return;
+  currentTheme = key;
+  const root = document.documentElement.style;
+  root.setProperty('--square-light', t.squareLight);
+  root.setProperty('--square-dark', t.squareDark);
+  root.setProperty('--last-light', t.lastLight);
+  root.setProperty('--last-dark', t.lastDark);
+  applyCustomPieceColors();
+  document.querySelectorAll('.theme-card').forEach(el=>{
+    el.classList.toggle('active', el.dataset.theme===key);
+  });
+}
+
+function buildThemeGrid(){
+  const grid = document.getElementById('theme-grid');
+  grid.innerHTML = '';
+  Object.keys(THEMES).forEach(key=>{
+    const t = THEMES[key];
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (key===currentTheme ? ' active':'');
+    card.dataset.theme = key;
+    const swatch = document.createElement('div');
+    swatch.className = 'theme-swatch';
+    for(let i=0;i<8;i++){
+      const cell = document.createElement('div');
+      const row = Math.floor(i/4), col = i%4;
+      cell.style.background = ((row+col)%2===0) ? t.squareLight : t.squareDark;
+      swatch.appendChild(cell);
+    }
+    const label = document.createElement('div');
+    label.className = 'theme-name';
+    label.textContent = t.name;
+    card.appendChild(swatch);
+    card.appendChild(label);
+    card.addEventListener('click', ()=> applyTheme(key));
+    grid.appendChild(card);
+  });
+}
+
+const settingsBtn = document.getElementById('settings-btn');
+const modalOverlay = document.getElementById('modal-overlay');
+const modalClose = document.getElementById('modal-close');
+const mateOverlay = document.getElementById('mate-overlay');
+const mateClose = document.getElementById('mate-close');
+const mateDismiss = document.getElementById('mate-dismiss');
+const mateNewgame = document.getElementById('mate-newgame');
+const mateTitle = document.getElementById('mate-title');
+const mateSub = document.getElementById('mate-sub');
+const mateCrown = document.getElementById('mate-crown');
+const confettiCanvas = document.getElementById('confetti-canvas');
+const confettiCtx = confettiCanvas.getContext('2d');
+let celebrated = false;
+
+const coachToggle = document.getElementById('coach-toggle');
+const coachToggleLabel = document.getElementById('coach-toggle-label');
+const voiceToggle = document.getElementById('voice-toggle');
+const voiceToggleLabel = document.getElementById('voice-toggle-label');
+const coachSpinner = document.getElementById('coach-spinner');
+const coachStatusText = document.getElementById('coach-status-text');
+const evalBarFill = document.getElementById('eval-bar-fill');
+const evalScoreEl = document.getElementById('eval-score');
+const evalLabelEl = document.getElementById('eval-label');
+const bestMoveChip = document.getElementById('best-move-chip');
+const bestMoveDesc = document.getElementById('best-move-desc');
+const coachLineEl = document.getElementById('coach-line');
+const arrowLayer = document.getElementById('coach-arrow-layer');
+const boardFrameEl = document.querySelector('.board-frame');
+const customWhiteInput = document.getElementById('custom-white-color');
+const customBlackInput = document.getElementById('custom-black-color');
+const resetPieceColorsBtn = document.getElementById('reset-piece-colors');
+const swapPieceColorsBtn = document.getElementById('swap-piece-colors');
+
+settingsBtn.addEventListener('click', ()=>{
+  buildThemeGrid();
+  customWhiteInput.value = customPieceColors.white || THEMES[currentTheme].pieceWhite;
+  customBlackInput.value = customPieceColors.black || THEMES[currentTheme].pieceBlack;
+  modalOverlay.classList.add('open');
+});
+modalClose.addEventListener('click', ()=> modalOverlay.classList.remove('open'));
+modalOverlay.addEventListener('click', (e)=>{
+  if(e.target===modalOverlay) modalOverlay.classList.remove('open');
+});
+
+customWhiteInput.addEventListener('input', ()=>{
+  customPieceColors.white = customWhiteInput.value;
+  applyCustomPieceColors();
+});
+customBlackInput.addEventListener('input', ()=>{
+  customPieceColors.black = customBlackInput.value;
+  applyCustomPieceColors();
+});
+resetPieceColorsBtn.addEventListener('click', ()=>{
+  customPieceColors.white = null;
+  customPieceColors.black = null;
+  customWhiteInput.value = THEMES[currentTheme].pieceWhite;
+  customBlackInput.value = THEMES[currentTheme].pieceBlack;
+  applyCustomPieceColors();
+});
+swapPieceColorsBtn.addEventListener('click', ()=>{
+  const w = customWhiteInput.value, b = customBlackInput.value;
+  customWhiteInput.value = b;
+  customBlackInput.value = w;
+  customPieceColors.white = b;
+  customPieceColors.black = w;
+  applyCustomPieceColors();
+});
+
+let game = new Chess();
+let mode = 'ai';          // 'ai' or 'two'
+let selected = null;      // currently selected square e.g. 'e2'
+let legalTargets = [];    // legal destination squares from selected
+let lastMove = null;      // {from,to}
+let aiThinking = false;
+let capturedByWhite = []; // black pieces captured by white
+let capturedByBlack = []; // white pieces captured by black
+
+// ── CHESS CLOCK STATE ──
+let timeControlMinutes = 5;
+let timeIncrementSec = 0;
+let clocksActive = true;
+let whiteTimeMs = 0;
+let blackTimeMs = 0;
+let clockTimerId = null;
+let lastTickTs = null;
+let gameEndedByTime = false;
+
+const UNICODE = {
+  p:'♟', n:'♞', b:'♝', r:'♜', q:'♛', k:'♚',
+  P:'♙', N:'♘', B:'♗', R:'♖', Q:'♕', K:'♔'
+};
+
+function pieceSVG(glyph, isWhite){
+  const cls = isWhite ? 'pg-white' : 'pg-black';
+  return `<svg class="piece-svg" viewBox="0 0 100 100">
+    <ellipse class="piece-shadow-ellipse" cx="50" cy="90" rx="27" ry="7"></ellipse>
+    <text x="50" y="80" text-anchor="middle" class="piece-glyph ${cls}" font-size="90">${glyph}</text>
+    <ellipse class="piece-gloss" cx="37" cy="32" rx="9" ry="5.5"></ellipse>
+  </svg>`;
+}
+const PIECE_VALUE = { p:100, n:320, b:330, r:500, q:900, k:20000 };
+
+const PAWN_PST = [
+  0,0,0,0,0,0,0,0,
+  50,50,50,50,50,50,50,50,
+  10,10,20,30,30,20,10,10,
+  5,5,10,25,25,10,5,5,
+  0,0,0,20,20,0,0,0,
+  5,-5,-10,0,0,-10,-5,5,
+  5,10,10,-20,-20,10,10,5,
+  0,0,0,0,0,0,0,0
+];
+const KNIGHT_PST = [
+  -50,-40,-30,-30,-30,-30,-40,-50,
+  -40,-20,0,0,0,0,-20,-40,
+  -30,0,10,15,15,10,0,-30,
+  -30,5,15,20,20,15,5,-30,
+  -30,0,15,20,20,15,0,-30,
+  -30,5,10,15,15,10,5,-30,
+  -40,-20,0,5,5,0,-20,-40,
+  -50,-40,-30,-30,-30,-30,-40,-50
+];
+const CENTER_PST = [
+  -20,-10,-10,-10,-10,-10,-10,-20,
+  -10,0,0,0,0,0,0,-10,
+  -10,0,5,5,5,5,0,-10,
+  -10,0,5,10,10,5,0,-10,
+  -10,0,5,10,10,5,0,-10,
+  -10,0,5,5,5,5,0,-10,
+  -10,0,0,0,0,0,0,-10,
+  -20,-10,-10,-10,-10,-10,-10,-20
+];
+
+function pstIndex(square, isWhite){
+  const file = square.charCodeAt(0) - 97;
+  const rank = parseInt(square[1],10) - 1;
+  const row = isWhite ? (7 - rank) : rank;
+  return row*8 + file;
+}
+
+function evaluateBoard(g){
+  const boardArr = g.board();
+  let score = 0;
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const cell = boardArr[r][c];
+      if(!cell) continue;
+      const sq = files[c] + (8-r);
+      let val = PIECE_VALUE[cell.type];
+      const idx = pstIndex(sq, cell.color==='w');
+      if(cell.type==='p') val += PAWN_PST[idx];
+      else if(cell.type==='n') val += KNIGHT_PST[idx];
+      else val += CENTER_PST[idx]*0.4;
+      score += (cell.color==='w') ? val : -val;
+    }
+  }
+  return score;
+}
+
+function negamax(g, depth, alpha, beta, color){
+  if(depth===0 || g.game_over()){
+    return color * evaluateBoard(g);
+  }
+  const moves = g.moves();
+  let best = -Infinity;
+  for(const m of moves){
+    g.move(m);
+    const score = -negamax(g, depth-1, -beta, -alpha, -color);
+    g.undo();
+    if(score > best) best = score;
+    if(best > alpha) alpha = best;
+    if(alpha >= beta) break;
+  }
+  return best;
+}
+
+function bestAiMove(depth){
+  const moves = game.moves();
+  if(moves.length===0) return null;
+  if(depth<=0){
+    return moves[Math.floor(Math.random()*moves.length)];
+  }
+  const color = game.turn()==='w' ? 1 : -1;
+  let best = null, bestScore = -Infinity;
+  const order = moves.slice().sort(()=>Math.random()-0.5);
+  for(const m of order){
+    game.move(m);
+    const score = -negamax(game, depth-1, -Infinity, Infinity, -color);
+    game.undo();
+    if(score > bestScore){ bestScore = score; best = m; }
+  }
+  return best;
+}
+
+function squareColor(fileIdx, rankIdx){
+  return ((fileIdx+rankIdx)%2===0) ? 'light' : 'dark';
+}
+
+function render(){
+  boardEl.innerHTML = '';
+  coordFilesEl.innerHTML = '';
+  const boardArr = game.board(); // row0 = rank8 ... row7 = rank1
+  const inCheck = game.in_check();
+  let checkSquare = null;
+  if(inCheck){
+    const turnColor = game.turn();
+    const arr = game.board();
+    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+      const cell = arr[r][c];
+      if(cell && cell.type==='k' && cell.color===turnColor){
+        checkSquare = files[c] + (8-r);
+      }
+    }
+  }
+
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const rank = 8 - r;
+      const file = files[c];
+      const sq = file + rank;
+      const cell = boardArr[r][c];
+      const div = document.createElement('div');
+      div.className = 'sq ' + squareColor(c, r);
+      div.dataset.square = sq;
+
+      if(lastMove && (sq===lastMove.from || sq===lastMove.to)) div.classList.add('last');
+      if(selected===sq) div.classList.add('selected');
+      if(checkSquare===sq) div.classList.add('check');
+      if(coachEnabled && coachBestMove){
+        if(sq===coachBestMove.from) div.classList.add('coach-from');
+        if(sq===coachBestMove.to) div.classList.add('coach-to');
+      }
+
+      if(cell){
+        const wrap = document.createElement('div');
+        wrap.className = 'piece-figure';
+        const isWhite = cell.color==='w';
+        const glyph = UNICODE[isWhite ? cell.type.toUpperCase() : cell.type];
+        wrap.innerHTML = pieceSVG(glyph, isWhite);
+        div.appendChild(wrap);
+      }
+
+      if(legalTargets.includes(sq)){
+        if(cell){
+          div.classList.add('capture-hint');
+        } else {
+          const dot = document.createElement('div');
+          dot.className = 'dot';
+          div.appendChild(dot);
+        }
+      }
+
+      div.addEventListener('click', onSquareClick);
+      boardEl.appendChild(div);
+    }
+  }
+
+  files.forEach(f=>{
+    const s = document.createElement('span');
+    s.textContent = f;
+    coordFilesEl.appendChild(s);
+  });
+
+  renderStatus(inCheck);
+  renderCaptures();
+  renderMoveList();
+  renderClocks();
+  drawCoachArrow();
+  maybeAnalyzePosition();
+}
+
+function renderStatus(inCheck){
+  statusBox.classList.remove('alert');
+  const turn = game.turn()==='w' ? 'White' : 'Black';
+  const dotClass = game.turn()==='w' ? 'w' : 'b';
+
+  if(game.in_checkmate()){
+    statusBox.classList.add('alert');
+    const winner = game.turn()==='w' ? 'Black' : 'White';
+    statusText.innerHTML = `Checkmate — <strong>${winner} wins.</strong>`;
+    statusBox.querySelector('.turn-dot')?.remove();
+    if(!celebrated){
+      celebrated = true;
+      celebrateCheckmate(winner);
+    }
+    return;
+  }
+  if(game.in_stalemate()){
+    statusText.innerHTML = 'Stalemate — the game is drawn.';
+    statusBox.querySelector('.turn-dot')?.remove();
+    return;
+  }
+  if(game.in_draw()){
+    statusText.innerHTML = 'Draw — insufficient material or repetition.';
+    statusBox.querySelector('.turn-dot')?.remove();
+    return;
+  }
+  let dotHtml = `<span class="turn-dot ${dotClass}"></span>`;
+  if(aiThinking){
+    statusBox.innerHTML = `${dotHtml}<span>Black is thinking&hellip;</span>`;
+    return;
+  }
+  if(inCheck){
+    statusBox.classList.add('alert');
+    statusBox.innerHTML = `${dotHtml}<span>${turn} is in check.</span>`;
+    return;
+  }
+  statusBox.innerHTML = `${dotHtml}<span>${turn} to move.</span>`;
+}
+
+function renderCaptures(){
+  capWhiteEl.innerHTML = capturedByWhite.map(p=>`<span class="piece black">${UNICODE[p]}</span>`).join(' ') || '&nbsp;';
+  capBlackEl.innerHTML = capturedByBlack.map(p=>`<span class="piece white">${UNICODE[p.toUpperCase()]}</span>`).join(' ') || '&nbsp;';
+}
+
+function renderMoveList(){
+  const history = game.history();
+  if(history.length===0){
+    movelistEl.innerHTML = '<div class="empty">No moves yet — make the first move.</div>';
+    return;
+  }
+  let html = '';
+  for(let i=0;i<history.length;i+=2){
+    const num = (i/2)+1;
+    const white = history[i] || '';
+    const black = history[i+1] || '';
+    html += `<div class="move-row"><span class="num">${num}.</span><span>${white}</span><span>${black}</span></div>`;
+  }
+  movelistEl.innerHTML = html;
+  movelistEl.scrollTop = movelistEl.scrollHeight;
+}
+
+function onSquareClick(e){
+  if(aiThinking) return;
+  if(game.game_over() || gameEndedByTime) return;
+  if(mode==='ai' && game.turn()!=='w') return; // player is always white vs AI
+
+  const sq = e.currentTarget.dataset.square;
+  const piece = game.get(sq);
+
+  if(selected){
+    if(legalTargets.includes(sq)){
+      makeMove(selected, sq);
+      selected = null; legalTargets = [];
+      render();
+      if(mode==='ai' && !game.game_over() && !gameEndedByTime && game.turn()==='b'){
+        aiThinking = true;
+        render();
+        setTimeout(()=>{
+          if(gameEndedByTime){ aiThinking = false; render(); return; }
+          const depth = parseInt(difficultySelect.value,10);
+          const mv = bestAiMove(depth);
+          if(mv){ makeMove(null, null, mv); }
+          aiThinking = false;
+          render();
+        }, 260);
+      }
+      return;
+    }
+    if(piece && piece.color===game.turn()){
+      selectSquare(sq);
+    } else {
+      selected = null; legalTargets = [];
+      render();
+    }
+    return;
+  }
+
+  if(piece && piece.color===game.turn()){
+    selectSquare(sq);
+  }
+}
+
+function selectSquare(sq){
+  selected = sq;
+  const moves = game.moves({square:sq, verbose:true});
+  legalTargets = moves.map(m=>m.to);
+  render();
+}
+
+function makeMove(from, to, sanMove){
+  let moveObj;
+  if(sanMove){
+    moveObj = game.move(sanMove);
+  } else {
+    moveObj = game.move({from, to, promotion:'q'});
+  }
+  if(moveObj && moveObj.captured){
+    if(moveObj.color==='w') capturedByWhite.push(moveObj.captured);
+    else capturedByBlack.push(moveObj.captured);
+  }
+  lastMove = moveObj ? {from:moveObj.from, to:moveObj.to} : lastMove;
+
+  if(moveObj && clocksActive && !gameEndedByTime){
+    // lock the time-control picker once the clock is actually running a game
+    lockTimeControlInputs(true);
+    if(timeIncrementSec > 0){
+      if(moveObj.color==='w') whiteTimeMs += timeIncrementSec*1000;
+      else blackTimeMs += timeIncrementSec*1000;
+    }
+    renderClocks();
+  }
+}
+
+/* ── CHESS CLOCK ── */
+
+function parseTimeControlValue(){
+  const val = timeControlSelect.value;
+  if(val === 'custom'){
+    const mins = parseFloat(customMinutesInput.value);
+    const inc = parseFloat(customIncrementInput.value);
+    return { minutes: (isFinite(mins) && mins>0) ? mins : 5, increment: (isFinite(inc) && inc>=0) ? inc : 0 };
+  }
+  const [m,i] = val.split('|').map(Number);
+  return { minutes: m, increment: i };
+}
+
+function formatClockTime(ms){
+  if(ms < 0) ms = 0;
+  const totalSec = Math.ceil(ms/1000);
+  const mm = Math.floor(totalSec/60);
+  const ss = totalSec%60;
+  if(mm===0 && ms < 10000){
+    // show tenths in the final 10 seconds, chess.com-style urgency
+    return (ms/1000).toFixed(1);
+  }
+  return mm + ':' + String(ss).padStart(2,'0');
+}
+
+function setupClocksForNewGame(){
+  const tc = parseTimeControlValue();
+  timeControlMinutes = tc.minutes;
+  timeIncrementSec = tc.increment;
+  clocksActive = timeControlMinutes > 0;
+  whiteTimeMs = timeControlMinutes * 60 * 1000;
+  blackTimeMs = timeControlMinutes * 60 * 1000;
+  gameEndedByTime = false;
+  stopClockTimer();
+
+  clockBlackBox.classList.toggle('hidden', !clocksActive);
+  clockWhiteBox.classList.toggle('hidden', !clocksActive);
+
+  renderClocks();
+  if(clocksActive){
+    startClockTimer();
+  }
+}
+
+function startClockTimer(){
+  stopClockTimer();
+  lastTickTs = Date.now();
+  clockTimerId = setInterval(tickClock, 100);
+}
+
+function stopClockTimer(){
+  if(clockTimerId){ clearInterval(clockTimerId); clockTimerId = null; }
+}
+
+function tickClock(){
+  if(!clocksActive || gameEndedByTime) return;
+  const now = Date.now();
+  const delta = now - lastTickTs;
+  lastTickTs = now;
+  if(game.game_over()){ stopClockTimer(); return; }
+
+  if(game.turn()==='w'){
+    whiteTimeMs -= delta;
+    if(whiteTimeMs <= 0){ whiteTimeMs = 0; handleFlagFall('w'); }
+  } else {
+    blackTimeMs -= delta;
+    if(blackTimeMs <= 0){ blackTimeMs = 0; handleFlagFall('b'); }
+  }
+  renderClocks();
+}
+
+function handleFlagFall(loserColor){
+  gameEndedByTime = true;
+  stopClockTimer();
+  aiThinking = false;
+  selected = null; legalTargets = [];
+  const winner = loserColor === 'w' ? 'Black' : 'White';
+  statusBox.classList.add('alert');
+  statusBox.innerHTML = `<span>Time's up — <strong>${winner} wins.</strong></span>`;
+  renderClocks();
+  if(!celebrated){
+    celebrated = true;
+    celebrateCheckmate(winner, "Ran out the clock — a win on time.");
+  }
+}
+
+function renderClocks(){
+  if(!clocksActive){
+    return;
+  }
+  clockWhiteTimeEl.textContent = formatClockTime(whiteTimeMs);
+  clockBlackTimeEl.textContent = formatClockTime(blackTimeMs);
+
+  const whiteTurn = game.turn()==='w' && !game.game_over() && !gameEndedByTime;
+  const blackTurn = game.turn()==='b' && !game.game_over() && !gameEndedByTime;
+  clockWhiteBox.classList.toggle('active', whiteTurn);
+  clockWhiteBox.classList.toggle('inactive', !whiteTurn);
+  clockBlackBox.classList.toggle('active', blackTurn);
+  clockBlackBox.classList.toggle('inactive', !blackTurn);
+
+  clockWhiteBox.classList.toggle('low-time', whiteTimeMs > 0 && whiteTimeMs <= 10000);
+  clockBlackBox.classList.toggle('low-time', blackTimeMs > 0 && blackTimeMs <= 10000);
+}
+
+timeControlSelect.addEventListener('change', ()=>{
+  customTimeFields.style.display = timeControlSelect.value==='custom' ? 'block' : 'none';
+  // free to re-pick before the game has actually started
+  if(game.history().length===0){
+    setupClocksForNewGame();
+  }
+});
+customMinutesInput.addEventListener('change', ()=>{ if(game.history().length===0) setupClocksForNewGame(); });
+customIncrementInput.addEventListener('change', ()=>{ if(game.history().length===0) setupClocksForNewGame(); });
+
+function lockTimeControlInputs(locked){
+  timeControlSelect.disabled = locked;
+  customMinutesInput.disabled = locked;
+  customIncrementInput.disabled = locked;
+}
+
+function newGame(){
+  game = new Chess();
+  selected = null; legalTargets = []; lastMove = null; aiThinking = false;
+  capturedByWhite = []; capturedByBlack = [];
+  celebrated = false;
+  closeMateOverlay();
+  resetCoachForNewPosition();
+  lockTimeControlInputs(false);
+  customTimeFields.style.display = timeControlSelect.value==='custom' ? 'block' : 'none';
+  setupClocksForNewGame();
+  render();
+}
+
+function undoMove(){
+  if(aiThinking) return;
+  game.undo();
+  if(mode==='ai' && game.history().length>0 && game.turn()==='b'){
+    game.undo();
+  }
+  // Recompute captures & lastMove from history to stay accurate
+  recomputeFromHistory();
+  celebrated = false;
+  closeMateOverlay();
+  resetCoachForNewPosition();
+  if(gameEndedByTime){
+    // the flag had fallen — undoing gives the game a reprieve, so restart the clock
+    gameEndedByTime = false;
+    if(clocksActive) startClockTimer();
+  }
+  if(game.history().length===0){
+    lockTimeControlInputs(false);
+  }
+  render();
+}
+
+function recomputeFromHistory(){
+  const verboseHistory = game.history({verbose:true});
+  capturedByWhite = []; capturedByBlack = [];
+  verboseHistory.forEach(m=>{
+    if(m.captured){
+      if(m.color==='w') capturedByWhite.push(m.captured);
+      else capturedByBlack.push(m.captured);
+    }
+  });
+  lastMove = verboseHistory.length ? {from:verboseHistory[verboseHistory.length-1].from, to:verboseHistory[verboseHistory.length-1].to} : null;
+  selected = null; legalTargets = [];
+}
+
+modeSeg.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  [...modeSeg.children].forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  mode = btn.dataset.mode;
+  difficultyField.style.display = mode==='ai' ? 'block' : 'none';
+  newGame();
+});
+
+document.getElementById('new-game').addEventListener('click', newGame);
+undoBtn.addEventListener('click', undoMove);
+
+/* ── CHECKMATE CELEBRATION ── */
+
+function closeMateOverlay(){
+  mateOverlay.classList.remove('show');
+  setTimeout(()=>{ mateOverlay.classList.remove('open'); }, 400);
+  stopConfetti();
+}
+
+mateClose.addEventListener('click', closeMateOverlay);
+mateDismiss.addEventListener('click', closeMateOverlay);
+mateNewgame.addEventListener('click', ()=>{ closeMateOverlay(); newGame(); });
+mateOverlay.addEventListener('click', (e)=>{ if(e.target===mateOverlay) closeMateOverlay(); });
+
+function celebrateCheckmate(winner, customSub){
+  const isWhite = winner === 'White';
+  mateCrown.innerHTML = isWhite ? '&#9812;' : '&#9818;';
+  mateTitle.innerHTML = `<em>${winner}</em> wins`;
+  document.querySelector('.mate-eyebrow').textContent = customSub ? 'Time' : 'Checkmate';
+  if(customSub){
+    mateSub.textContent = customSub;
+  } else {
+    const subs = isWhite
+      ? ['The king has nowhere left to run.', 'A clean, quiet finish.', 'Every escape square, covered.']
+      : ['The king has nowhere left to run.', 'Black closes it out in style.', 'No square left to hide on.'];
+    mateSub.textContent = subs[Math.floor(Math.random()*subs.length)];
+  }
+
+  mateOverlay.classList.add('open');
+  // force reflow so the transition triggers
+  void mateOverlay.offsetWidth;
+  mateOverlay.classList.add('show');
+
+  startConfetti(isWhite);
+}
+
+/* Lightweight canvas confetti, no external libs */
+let confettiParticles = [];
+let confettiRAF = null;
+let confettiStart = 0;
+const CONFETTI_DURATION = 3200; // ms of active bursting
+const CONFETTI_FADE = 1400;     // ms tail-off after duration
+
+function resizeConfettiCanvas(){
+  confettiCanvas.width = window.innerWidth * devicePixelRatio;
+  confettiCanvas.height = window.innerHeight * devicePixelRatio;
+  confettiCanvas.style.width = window.innerWidth + 'px';
+  confettiCanvas.style.height = window.innerHeight + 'px';
+}
+window.addEventListener('resize', resizeConfettiCanvas);
+resizeConfettiCanvas();
+
+const CONFETTI_COLORS = ['#BC9552', '#E0C480', '#F2E9D8', '#8AA678', '#B24A3E', '#FBF6EA'];
+
+function makeConfettiPiece(){
+  const w = window.innerWidth;
+  return {
+    x: Math.random() * w,
+    y: -20 - Math.random() * 200,
+    vx: (Math.random() - 0.5) * 2.4,
+    vy: 2 + Math.random() * 2.5,
+    size: 5 + Math.random() * 6,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.2,
+    shape: Math.random() < 0.5 ? 'rect' : 'circle',
+    sway: Math.random() * Math.PI * 2,
+    swaySpeed: 0.02 + Math.random() * 0.02
+  };
+}
+
+function startConfetti(){
+  confettiParticles = [];
+  confettiStart = performance.now();
+  for(let i=0;i<50;i++){
+    const p = makeConfettiPiece();
+    p.y = Math.random() * -window.innerHeight;
+    confettiParticles.push(p);
+  }
+  if(confettiRAF) cancelAnimationFrame(confettiRAF);
+  confettiRAF = requestAnimationFrame(confettiTick);
+}
+
+function stopConfetti(){
+  if(confettiRAF){ cancelAnimationFrame(confettiRAF); confettiRAF = null; }
+  confettiParticles = [];
+  confettiCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+}
+
+function confettiTick(now){
+  const elapsed = now - confettiStart;
+  const dpr = devicePixelRatio;
+  confettiCtx.setTransform(dpr,0,0,dpr,0,0);
+  confettiCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+  if(elapsed < CONFETTI_DURATION && Math.random() < 0.6){
+    confettiParticles.push(makeConfettiPiece());
+  }
+
+  const h = window.innerHeight;
+  confettiParticles.forEach(p=>{
+    p.sway += p.swaySpeed;
+    p.x += p.vx + Math.sin(p.sway) * 0.6;
+    p.y += p.vy;
+    p.rot += p.rotSpeed;
+  });
+  confettiParticles = confettiParticles.filter(p => p.y < h + 30);
+
+  confettiParticles.forEach(p=>{
+    confettiCtx.save();
+    confettiCtx.translate(p.x, p.y);
+    confettiCtx.rotate(p.rot);
+    confettiCtx.fillStyle = p.color;
+    if(p.shape === 'rect'){
+      confettiCtx.fillRect(-p.size/2, -p.size/3, p.size, p.size*0.65);
+    } else {
+      confettiCtx.beginPath();
+      confettiCtx.arc(0,0,p.size/2,0,Math.PI*2);
+      confettiCtx.fill();
+    }
+    confettiCtx.restore();
+  });
+
+  if(elapsed < CONFETTI_DURATION + CONFETTI_FADE || confettiParticles.length > 0){
+    confettiRAF = requestAnimationFrame(confettiTick);
+  } else {
+    confettiRAF = null;
+  }
+}
+
+/* ── STOCKFISH COACH ── */
+
+// Self-contained asm.js build: no separate .wasm binary to fetch, so it
+// works reliably as a cross-origin worker (including from local file:// pages).
+// Minified build downloads and parses noticeably faster than the unminified one.
+const STOCKFISH_URL = 'https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.min.js';
+const COACH_DEPTH = 13;
+const COACH_LOAD_TIMEOUT_MS = 10000;
+const ENGINE_CACHE_NAME = 'sf-coach-engine-v1';
+
+let coachEnabled = true;
+let coachEngine = null;
+let coachReady = false;
+let coachBusy = false;
+let coachQueuedFen = null;
+let lastAnalyzedFen = null;
+let coachBestMove = null;       // {from,to,promotion}
+let coachBestMoveSan = null;
+let coachPvSan = [];
+let coachScore = null;          // {type:'cp'|'mate', value:Number, whiteRelative:Number}
+let coachLoadTimer = null;
+
+async function fetchEngineCode(url){
+  // Try the Cache Storage API first so repeat visits skip the network
+  // entirely — this is the biggest lever for a fast subsequent load.
+  if('caches' in window){
+    try{
+      const cache = await caches.open(ENGINE_CACHE_NAME);
+      const cached = await cache.match(url);
+      if(cached) return await cached.text();
+      const res = await fetch(url);
+      if(res.ok){
+        cache.put(url, res.clone());
+        return await res.text();
+      }
+      throw new Error('HTTP ' + res.status);
+    } catch(e){
+      // fall through to a plain fetch below
+    }
+  }
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.text();
+}
+
+async function initCoachEngine(){
+  coachStatusText.textContent = 'Loading engine\u2026';
+  coachSpinner.style.display = 'block';
+
+  try{
+    const code = await fetchEngineCode(STOCKFISH_URL);
+    const blob = new Blob([code], {type:'application/javascript'});
+    const blobUrl = URL.createObjectURL(blob);
+    coachEngine = new Worker(blobUrl);
+  } catch(err){
+    showCoachError('Coach unavailable — could not download the engine (' + err.message + ').');
+    return;
+  }
+
+  wireCoachEngine();
+
+  coachLoadTimer = setTimeout(()=>{
+    if(!coachReady){
+      showCoachError('Coach unavailable — the engine did not respond. Check your connection and retry.');
+    }
+  }, COACH_LOAD_TIMEOUT_MS);
+}
+
+function showCoachError(message){
+  coachStatusText.textContent = message;
+  coachSpinner.style.display = 'none';
+  renderCoachRetryButton();
+}
+
+function renderCoachRetryButton(){
+  if(document.getElementById('coach-retry-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'coach-retry-btn';
+  btn.className = 'btn';
+  btn.style.marginTop = '0.6rem';
+  btn.textContent = 'Retry';
+  btn.addEventListener('click', async ()=>{
+    btn.remove();
+    if(coachEngine){ try{ coachEngine.terminate(); }catch(e){} }
+    coachEngine = null;
+    coachReady = false;
+    if(coachLoadTimer) clearTimeout(coachLoadTimer);
+    // clear any bad/partial cached copy before trying again
+    if('caches' in window){
+      try{ const cache = await caches.open(ENGINE_CACHE_NAME); await cache.delete(STOCKFISH_URL); }catch(e){}
+    }
+    initCoachEngine();
+  });
+  document.getElementById('coach-status-line').appendChild(btn);
+}
+
+function wireCoachEngine(){
+  coachEngine.onmessage = handleCoachMessage;
+  coachEngine.onerror = function(err){
+    if(coachLoadTimer) clearTimeout(coachLoadTimer);
+    showCoachError('Coach unavailable — the engine hit an error.');
+  };
+  coachEngine.postMessage('uci');
+}
+
+
+function handleCoachMessage(e){
+  const line = typeof e.data === 'string' ? e.data : (e.data && e.data.data) || '';
+  if(!line) return;
+
+  if(line === 'uciok'){
+    coachEngine.postMessage('setoption name Skill Level value 20');
+    coachEngine.postMessage('setoption name UCI_LimitStrength value false');
+    coachEngine.postMessage('setoption name Threads value 1');
+    coachEngine.postMessage('isready');
+    return;
+  }
+
+  if(line === 'readyok'){
+    coachReady = true;
+    if(coachLoadTimer){ clearTimeout(coachLoadTimer); coachLoadTimer = null; }
+    coachStatusText.textContent = coachEnabled ? 'Ready.' : 'Analysis paused.';
+    coachSpinner.style.display = coachEnabled ? 'block' : 'none';
+    maybeAnalyzePosition();
+    return;
+  }
+
+  if(line.startsWith('info')){
+    parseCoachInfoLine(line);
+    return;
+  }
+
+  if(line.startsWith('bestmove')){
+    coachBusy = false;
+    coachSpinner.style.display = 'none';
+    finalizeCoachSuggestion();
+    // a queued position arrived while we were thinking — analyze it now
+    if(coachQueuedFen){
+      const fen = coachQueuedFen;
+      coachQueuedFen = null;
+      runCoachAnalysis(fen);
+    }
+  }
+}
+
+function parseCoachInfoLine(line){
+  const parts = line.split(' ');
+  let scoreType = null, scoreValue = null, pvStart = -1;
+  for(let i=0;i<parts.length;i++){
+    if(parts[i]==='score'){
+      scoreType = parts[i+1];
+      scoreValue = parseInt(parts[i+2],10);
+    }
+    if(parts[i]==='pv'){
+      pvStart = i+1;
+      break;
+    }
+  }
+  if(scoreType && !Number.isNaN(scoreValue)){
+    // score is from the perspective of the side to move; normalize to White-relative
+    const sideToMove = game.turn();
+    const whiteRelative = sideToMove === 'w' ? scoreValue : -scoreValue;
+    coachScore = { type: scoreType, value: scoreValue, whiteRelative };
+  }
+  if(pvStart > -1){
+    const uciPv = parts.slice(pvStart).filter(Boolean);
+    if(uciPv.length){
+      applyPvToState(uciPv);
+    }
+  }
+  renderCoachPanel();
+}
+
+function applyPvToState(uciPv){
+  const temp = new Chess(game.fen());
+  const sanLine = [];
+  let first = null;
+  for(let i=0;i<uciPv.length && i<6;i++){
+    const uci = uciPv[i];
+    const from = uci.slice(0,2), to = uci.slice(2,4);
+    const promo = uci.length>4 ? uci.slice(4,5) : undefined;
+    const mv = temp.move({from, to, promotion: promo || 'q'});
+    if(!mv) break;
+    if(i===0) first = {from, to, promotion: promo, san: mv.san};
+    sanLine.push(mv.san);
+  }
+  if(first){
+    coachBestMove = {from:first.from, to:first.to, promotion:first.promotion};
+    coachBestMoveSan = first.san;
+    coachPvSan = sanLine;
+  }
+}
+
+function finalizeCoachSuggestion(){
+  renderCoachPanel();
+  drawCoachArrow();
+  speakCoachSuggestion();
+}
+
+/* ── VOICE (TEXT-TO-SPEECH) ── */
+
+let voiceEnabled = false;
+const speechSupported = 'speechSynthesis' in window;
+let coachVoice = null;
+
+if(speechSupported){
+  const pickVoice = ()=>{
+    const voices = window.speechSynthesis.getVoices();
+    coachVoice = voices.find(v=>/en[-_](GB|US)/i.test(v.lang) && /female|Female|Samantha|Victoria|Google UK English Female/i.test(v.name))
+      || voices.find(v=>/^en/i.test(v.lang))
+      || voices[0] || null;
+  };
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+} else {
+  voiceToggleLabel.textContent = 'Voice unsupported';
+  voiceToggle.style.opacity = '0.4';
+  voiceToggle.style.cursor = 'default';
+}
+
+function numberToSpokenPawns(n){
+  return Math.abs(n).toFixed(2).replace('.', ' point ');
+}
+
+function buildSpokenSuggestion(){
+  if(!coachBestMoveSan) return '';
+  const mover = game.turn()==='w' ? 'White' : 'Black';
+  let evalPhrase = '';
+  if(coachScore){
+    if(coachScore.type==='mate'){
+      const n = Math.abs(coachScore.value);
+      const side = coachScore.whiteRelative>0 ? 'White' : 'Black';
+      evalPhrase = `Mate in ${n} for ${side}.`;
+    } else {
+      const pawns = coachScore.whiteRelative/100;
+      if(Math.abs(pawns) < 0.15){
+        evalPhrase = 'Position is roughly even.';
+      } else {
+        const side = pawns>0 ? 'White' : 'Black';
+        evalPhrase = `${side} is ahead by about ${numberToSpokenPawns(pawns)} pawns.`;
+      }
+    }
+  }
+  return `Coach suggests: ${coachBestMoveSan}, for ${mover}. ${evalPhrase}`;
+}
+
+function speakCoachSuggestion(){
+  if(!speechSupported || !voiceEnabled || !coachEnabled) return;
+  const text = buildSpokenSuggestion();
+  if(!text) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  if(coachVoice) utter.voice = coachVoice;
+  utter.rate = 1.02;
+  utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+}
+
+voiceToggle.addEventListener('click', ()=>{
+  if(!speechSupported) return;
+  voiceEnabled = !voiceEnabled;
+  voiceToggle.classList.toggle('on', voiceEnabled);
+  voiceToggleLabel.textContent = voiceEnabled ? 'Voice on' : 'Voice off';
+  if(voiceEnabled){
+    speakCoachSuggestion();
+  } else {
+    window.speechSynthesis.cancel();
+  }
+});
+
+function resetCoachForNewPosition(){
+  if(coachEngine && coachBusy){ coachEngine.postMessage('stop'); }
+  coachBusy = false;
+  coachQueuedFen = null;
+  lastAnalyzedFen = null;
+  coachBestMove = null;
+  coachBestMoveSan = null;
+  coachPvSan = [];
+  coachScore = null;
+}
+
+function maybeAnalyzePosition(){
+  if(!coachEnabled || !coachReady || !coachEngine) return;
+  if(game.game_over() || gameEndedByTime) return;
+  if(aiThinking) return;
+  const fen = game.fen();
+  if(fen === lastAnalyzedFen) return;
+  runCoachAnalysis(fen);
+}
+
+function runCoachAnalysis(fen){
+  lastAnalyzedFen = fen;
+  coachScore = null;
+  coachBestMove = null;
+  coachBestMoveSan = null;
+  coachPvSan = [];
+
+  if(coachBusy){
+    coachEngine.postMessage('stop');
+    coachQueuedFen = fen;
+    return;
+  }
+  coachBusy = true;
+  coachSpinner.style.display = 'block';
+  coachStatusText.textContent = 'Thinking\u2026';
+  renderCoachPanel();
+  coachEngine.postMessage('position fen ' + fen);
+  coachEngine.postMessage('go depth ' + COACH_DEPTH);
+}
+
+function renderCoachPanel(){
+  if(!coachEnabled){
+    coachStatusText.textContent = 'Analysis paused.';
+    coachSpinner.style.display = 'none';
+    bestMoveChip.textContent = '\u2014';
+    bestMoveDesc.textContent = 'Turn analysis on to get a suggestion.';
+    coachLineEl.textContent = '';
+    evalScoreEl.textContent = '\u2014';
+    evalLabelEl.textContent = 'Analysis off';
+    evalBarFill.style.height = '50%';
+    return;
+  }
+
+  if(game.game_over() || gameEndedByTime){
+    coachStatusText.textContent = 'Game over.';
+    coachSpinner.style.display = 'none';
+    bestMoveChip.textContent = '\u2014';
+    bestMoveDesc.textContent = 'No more moves to suggest.';
+    coachLineEl.textContent = '';
+    return;
+  }
+
+  if(coachBusy) coachStatusText.textContent = 'Thinking\u2026';
+  else if(coachReady) coachStatusText.textContent = 'Ready.';
+
+  if(coachScore){
+    const pawns = coachScore.type==='cp' ? (coachScore.whiteRelative/100) : null;
+    if(coachScore.type==='mate'){
+      const matingSide = coachScore.whiteRelative>0 ? 'White' : 'Black';
+      const n = Math.abs(coachScore.value);
+      evalScoreEl.textContent = (coachScore.whiteRelative>0?'+':'\u2212') + 'M' + n;
+      evalLabelEl.textContent = `Mate in ${n} for ${matingSide}`;
+      evalBarFill.style.height = coachScore.whiteRelative>0 ? '100%' : '0%';
+    } else {
+      const sign = pawns>0 ? '+' : (pawns<0 ? '\u2212' : '');
+      evalScoreEl.textContent = sign + Math.abs(pawns).toFixed(2);
+      evalLabelEl.textContent = Math.abs(pawns)<0.15 ? 'Even position' : (pawns>0 ? 'White is better' : 'Black is better');
+      const clamped = Math.max(-6, Math.min(6, pawns));
+      const pct = 50 + (clamped/6)*50;
+      evalBarFill.style.height = pct + '%';
+    }
+  }
+
+  if(coachBestMoveSan){
+    bestMoveChip.textContent = coachBestMoveSan;
+    const mover = game.turn()==='w' ? 'White' : 'Black';
+    bestMoveDesc.textContent = `${mover} to play — Coach's top choice at depth ${COACH_DEPTH}.`;
+    coachLineEl.innerHTML = coachPvSan.length>1
+      ? '<strong>Line:</strong> ' + coachPvSan.join(' \u00b7 ')
+      : '';
+  } else if(!coachBusy){
+    bestMoveChip.textContent = '\u2014';
+    bestMoveDesc.textContent = 'Calculating\u2026';
+  }
+}
+
+function drawCoachArrow(){
+  arrowLayer.innerHTML = '';
+  if(!coachEnabled || !coachBestMove || game.game_over() || gameEndedByTime) return;
+
+  const fromEl = boardEl.querySelector(`[data-square="${coachBestMove.from}"]`);
+  const toEl = boardEl.querySelector(`[data-square="${coachBestMove.to}"]`);
+  if(!fromEl || !toEl) return;
+
+  const frameRect = boardFrameEl.getBoundingClientRect();
+  const fromRect = fromEl.getBoundingClientRect();
+  const toRect = toEl.getBoundingClientRect();
+
+  const x1 = fromRect.left + fromRect.width/2 - frameRect.left;
+  const y1 = fromRect.top + fromRect.height/2 - frameRect.top;
+  const x2 = toRect.left + toRect.width/2 - frameRect.left;
+  const y2 = toRect.top + toRect.height/2 - frameRect.top;
+
+  arrowLayer.setAttribute('viewBox', `0 0 ${frameRect.width} ${frameRect.height}`);
+  arrowLayer.setAttribute('width', frameRect.width);
+  arrowLayer.setAttribute('height', frameRect.height);
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(ns,'defs');
+  const marker = document.createElementNS(ns,'marker');
+  marker.setAttribute('id','coach-arrowhead');
+  marker.setAttribute('markerWidth','8');
+  marker.setAttribute('markerHeight','8');
+  marker.setAttribute('refX','4');
+  marker.setAttribute('refY','4');
+  marker.setAttribute('orient','auto');
+  const markerPath = document.createElementNS(ns,'path');
+  markerPath.setAttribute('d','M0,0 L8,4 L0,8 Z');
+  markerPath.setAttribute('fill','#E0C480');
+  marker.appendChild(markerPath);
+  defs.appendChild(marker);
+  arrowLayer.appendChild(defs);
+
+  // shorten the line so the head doesn't sit under the destination piece
+  const dx = x2-x1, dy = y2-y1;
+  const len = Math.sqrt(dx*dx+dy*dy) || 1;
+  const shrink = Math.min(len*0.32, 22);
+  const ex = x2 - (dx/len)*shrink;
+  const ey = y2 - (dy/len)*shrink;
+
+  const line = document.createElementNS(ns,'line');
+  line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+  line.setAttribute('x2',ex); line.setAttribute('y2',ey);
+  line.setAttribute('stroke','#E0C480');
+  line.setAttribute('stroke-width','6');
+  line.setAttribute('stroke-linecap','round');
+  line.setAttribute('opacity','0.85');
+  line.setAttribute('marker-end','url(#coach-arrowhead)');
+  arrowLayer.appendChild(line);
+}
+
+coachToggle.addEventListener('click', ()=>{
+  coachEnabled = !coachEnabled;
+  coachToggle.classList.toggle('on', coachEnabled);
+  coachToggleLabel.textContent = coachEnabled ? 'Analysis on' : 'Analysis off';
+  if(coachEnabled){
+    coachBestMove = null; coachBestMoveSan = null; coachPvSan = []; coachScore = null;
+    lastAnalyzedFen = null;
+    maybeAnalyzePosition();
+  } else {
+    if(coachEngine && coachBusy) coachEngine.postMessage('stop');
+    coachBestMove = null;
+    if(speechSupported) window.speechSynthesis.cancel();
+    renderCoachPanel();
+    drawCoachArrow();
+  }
+});
+
+window.addEventListener('resize', ()=>{ if(coachEnabled) drawCoachArrow(); });
+
+initCoachEngine();
+renderCoachPanel();
+
+setupClocksForNewGame();
+render();
+</script>
+</body>
+</html>

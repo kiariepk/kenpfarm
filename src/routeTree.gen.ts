@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ChessPRouteImport } from './routes/chess-p'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CowsMilkRouteImport } from './routes/cows-milk'
 import { Route as EggsRouteImport } from './routes/eggs'
@@ -44,6 +45,11 @@ const AboutRoute = AboutRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChessPRoute = ChessPRouteImport.update({
+  id: '/chess-p',
+  path: '/chess-p',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/chess-p': typeof ChessPRoute
   '/contact': typeof ContactRoute
   '/cows-milk': typeof CowsMilkRoute
   '/eggs': typeof EggsRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/chess-p': typeof ChessPRoute
   '/contact': typeof ContactRoute
   '/cows-milk': typeof CowsMilkRoute
   '/eggs': typeof EggsRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/chess-p': typeof ChessPRoute
   '/contact': typeof ContactRoute
   '/cows-milk': typeof CowsMilkRoute
   '/eggs': typeof EggsRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/chess-p'
     | '/contact'
     | '/cows-milk'
     | '/eggs'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/chess-p'
     | '/contact'
     | '/cows-milk'
     | '/eggs'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/chess-p'
     | '/contact'
     | '/cows-milk'
     | '/eggs'
@@ -229,6 +241,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
+  ChessPRoute: typeof ChessPRoute
   ContactRoute: typeof ContactRoute
   CowsMilkRoute: typeof CowsMilkRoute
   EggsRoute: typeof EggsRoute
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chess-p': {
+      id: '/chess-p'
+      path: '/chess-p'
+      fullPath: '/chess-p'
+      preLoaderRoute: typeof ChessPRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -395,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
+  ChessPRoute: ChessPRoute,
   ContactRoute: ContactRoute,
   CowsMilkRoute: CowsMilkRoute,
   EggsRoute: EggsRoute,
