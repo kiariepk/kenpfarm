@@ -111,7 +111,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   // Standalone pages (hosted under their own address) render without the farm site chrome.
-  const isStandalonePage = pathname === "/the-open-table";
+  const isStandalonePage =
+    pathname === "/the-open-table" || pathname === "/chess-p";
 
   return (
     <QueryClientProvider client={queryClient}>
